@@ -95,7 +95,10 @@ int main (int argc, char *argv[])
 	if (args_info.inputs_num>0) {
 	seq=args_info.inputs[0];
 	} else {
-		if(!args_info.input_file_given) std::getline(std::cin,seq);
+		if(!args_info.input_file_given) {
+		std::cout << "Sequence: ";
+		std::getline(std::cin,seq);
+		}
 	}
 
 	std::string restricted;
