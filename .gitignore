@@ -38,5 +38,5 @@ bash.sh
 # Visual Studio Code
 .vscode/
 
-# venv
+# virtual environment
 venv/
