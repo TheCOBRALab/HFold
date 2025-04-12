@@ -52,7 +52,7 @@ make install
 2. From a command line in the root directory (where this README.md is) run
 ```
 cmake -H. -Bbuild
-cmake --build build
+cmake --build build --parallel
 ```   
 If you need to specify a specific compiler, such as g++, you can instead run something like   
 ```
