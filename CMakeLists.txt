@@ -14,14 +14,15 @@ set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -flto")
 
 SET(SOURCE
+  src/main.cpp
   src/W_final.cpp 
   src/pseudo_loop.cpp 
   src/HFold.cpp
-  src/cmdline.cc
-  src/Result.cc	
+  src/cmdline.cpp
+  src/Result.cpp	
   src/s_energy_matrix.cpp	
-  src/Hotspot.cc
-  src/sparse_tree.cc
+  src/Hotspot.cpp
+  src/sparse_tree.cpp
 )
 
 set(constraints_SOURCE

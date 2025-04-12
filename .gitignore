@@ -37,3 +37,6 @@ bash.sh
 
 # Visual Studio Code
 .vscode/
+
+# venv
+venv/
