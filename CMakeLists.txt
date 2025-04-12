@@ -1,72 +1,72 @@
-cmake_minimum_required(VERSION 3.8)
-project(HFold)
+cmake_minimum_required(VERSION 3.15)
+project(HFold
+    LANGUAGES C CXX
+    DESCRIPTION "RNA folding prediction tool"
+)
 
+# Set standards before targets are created
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-
+# Default to Release build if no configuration is specified
 if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Release)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
 endif()
 
-set(CMAKE_CXX_FLAGS "-Wall -Wextra")
-set(CMAKE_CXX_FLAGS_DEBUG "-g")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -flto")
-
-SET(SOURCE
-  src/main.cpp
-  src/W_final.cpp 
-  src/pseudo_loop.cpp 
-  src/HFold.cpp
-  src/cmdline.cpp
-  src/Result.cpp	
-  src/s_energy_matrix.cpp	
-  src/Hotspot.cpp
-  src/sparse_tree.cpp
+# Organize sources using modern list structure
+set(hfold_sources
+    src/main.cpp
+    src/W_final.cpp 
+    src/pseudo_loop.cpp 
+    src/HFold.cpp
+    src/cmdline.cpp
+    src/Result.cpp	
+    src/s_energy_matrix.cpp	
+    src/Hotspot.cpp
+    src/sparse_tree.cpp
 )
 
-set(constraints_SOURCE
+set(vienna_sources
+    # Constraints
     src/ViennaRNA/constraints/constraints.c
     src/ViennaRNA/constraints/hard.c
     src/ViennaRNA/constraints/SHAPE.c
     src/ViennaRNA/constraints/soft.c
-) 
-set(datastructures_SOURCE
+    
+    # Datastructures
     src/ViennaRNA/datastructures/basic_datastructures.c
     src/ViennaRNA/datastructures/char_stream.c
     src/ViennaRNA/datastructures/lists.c
-)
-set(io_SOURCE
+    
+    # I/O
     src/ViennaRNA/io/file_formats.c
     src/ViennaRNA/io/io_utils.c
-)
-set(landscape_SOURCE
+    
+    # Landscape
     src/ViennaRNA/landscape/move.c
-)
-set(loops_SOURCE
+    
+    # Loops
     src/ViennaRNA/loops/external_pf.c
     src/ViennaRNA/loops/external.c
     src/ViennaRNA/loops/hairpin.c
     src/ViennaRNA/loops/internal.c
     src/ViennaRNA/loops/multibranch.c
-)
-set(params_SOURCE
+    
+    # Parameters
     src/ViennaRNA/params/default.c
     src/ViennaRNA/params/params.c
     src/ViennaRNA/params/io.c
-)
-set(utils_SOURCE
+    
+    # Utilities
     src/ViennaRNA/utils/cpu.c
     src/ViennaRNA/utils/higher_order_functions.c
     src/ViennaRNA/utils/string_utils.c
     src/ViennaRNA/utils/structure_utils.c
     src/ViennaRNA/utils/utils.c
-)
-set(vienna_SOURCE
-    ${constraints_SOURCE} ${datastructures_SOURCE}
-    ${io_SOURCE} ${landscape_SOURCE}
-    ${loops_SOURCE} ${params_SOURCE}
-    ${utils_SOURCE}
+    
+    # Core ViennaRNA
     src/ViennaRNA/alphabet.c
     src/ViennaRNA/boltzmann_sampling.c
     src/ViennaRNA/centroid.c
@@ -87,19 +87,27 @@ set(vienna_SOURCE
     src/ViennaRNA/ribo.c
     src/ViennaRNA/sequence.c
     src/ViennaRNA/subopt.c
-    src/ViennaRNA/unstructured_domains.c  
+    src/ViennaRNA/unstructured_domains.c
 )
 
-add_library(RNA STATIC ${vienna_SOURCE})
-# configure_file(RNA.pc.in RNA.pc @ONLY)
+# RNA static library (ViennaRNA)
+add_library(RNA STATIC ${vienna_sources})
+target_include_directories(RNA PUBLIC 
+    src
+)
 
-target_include_directories(RNA PRIVATE .)
+target_compile_options(RNA PRIVATE
+    $<$<CONFIG:Debug>:-g -Wall -Wextra>
+    $<$<CONFIG:Release>:-O3 -flto>
+)
 
-add_executable(HFold ${SOURCE})
-
+# HFold executable
+add_executable(HFold ${hfold_sources})
 target_link_libraries(HFold PRIVATE RNA)
+target_compile_options(HFold PRIVATE
+    $<$<CONFIG:Debug>:-g -Wall -Wextra> # cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Debug
+    $<$<CONFIG:Release>:-O3 -flto>      # cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release
+)
 
-# Install HFold into the bin directory
+# Installation (For Conda package)
 install(TARGETS HFold RUNTIME DESTINATION bin)
-
-include_directories(src)

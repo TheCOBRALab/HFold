@@ -21,6 +21,7 @@ with codecs.open(os.path.join(here, "README.md"), encoding="utf-8") as fh:
 def get_cpp_sources():
     cpp_files = glob.glob("src/**/*.cpp", recursive=True)
     cpp_files += glob.glob("bindings/**/*.cpp", recursive=True)
+    cpp_files.remove("src/main.cpp")
     # Exclude main.cpp or anything else
     # cpp_files = [f for f in cpp_files if not os.path.basename(f) == "main.cpp"]
     return cpp_files
