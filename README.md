@@ -57,7 +57,7 @@ cmake --build build
 If you need to specify a specific compiler, such as g++, you can instead run something like   
 ```
 cmake -H. -Bbuild -DCMAKE_CXX_COMPILER=g++
-cmake --build build
+cmake --build build --parallel
 ```   
 This can be useful if you are getting errors about your compiler not having C++11 features.
 

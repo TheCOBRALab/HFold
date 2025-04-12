@@ -19,18 +19,27 @@ with codecs.open(os.path.join(here, "README.md"), encoding="utf-8") as fh:
 
 # Recursively collect all .cpp files from src/ and bindings/, EXCEPT main.cpp
 def get_cpp_sources():
-    cpp_files = glob.glob("src/**/*.cc", recursive=True)
-    cpp_files += glob.glob("bindings/**/*.cc", recursive=True)
+    cpp_files = glob.glob("src/**/*.cpp", recursive=True)
+    cpp_files += glob.glob("bindings/**/*.cpp", recursive=True)
     # Exclude main.cpp or anything else
     # cpp_files = [f for f in cpp_files if not os.path.basename(f) == "main.cpp"]
     return cpp_files
 
+def get_c_sources():
+    c_files = glob.glob("src/ViennaRNA/**/*.c", recursive=True)
+    c_files = [f for f in c_files if "avx512" not in f.lower()]
+    # Exclude main.cpp or anything else
+    # c_files = [f for f in c_files if not os.path.basename(f) == "main.cpp"]
+    return c_files
 
-# Define the extension module
+
+cpp_sources = get_cpp_sources()
+c_sources = get_c_sources()
+
 ext_modules = [
     Extension(
-        "hfold",
-        get_cpp_sources(),
+        "hfold",  # This is your pybind11 module, must be C++
+        cpp_sources,
         include_dirs=[
             os.path.join(here, "src"),
             os.path.join(here, "bindings"),
@@ -39,7 +48,17 @@ ext_modules = [
         ],
         language="c++",
         extra_compile_args=["-O3", "-std=c++17", "-DHAVE_STRDUP=1"],
-    )
+    ),
+    Extension(
+        "hfold_c",  # Dummy C extension just to compile C files (no pybind11)
+        c_sources,
+        include_dirs=[
+            os.path.join(here, "src"),
+            os.path.join(here, "bindings"),
+        ],
+        language="c",
+        extra_compile_args=["-O3", "-DHAVE_STRDUP=1"],
+    ),
 ]
 
 # Check if the user is using Python 3.6 or higher
