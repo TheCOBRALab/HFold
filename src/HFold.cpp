@@ -170,6 +170,10 @@ int main (int argc, char *argv[])
 
 		sparse_tree tree(structure,n);
 		std::string final_structure = hfold(seq,structure, energy,tree,pk_free,pk_only, dangles);
+		if(!args_info.input_structure_given && energy>0.0){
+			energy = 0.0;
+			final_structure = std::string(n,'.');
+		}
 		
 		Result result(seq,hotspot_list[i].get_structure(),hotspot_list[i].get_energy(),final_structure,energy);
 		result_list.push_back(result);
