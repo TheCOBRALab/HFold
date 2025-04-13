@@ -34,7 +34,7 @@ int main (int argc, char *argv[])
 	std::string fileO;
     args_info.output_file_given ? fileO = output_file : fileO = "";	
 
-	int number_of_suboptimal_structure = args_info.subopt_given ? subopt : 1;
+	int number_of_suboptimal_structure = args_info.subopt_given ? suboptimal : 1;
 
 	bool pk_free = args_info.pk_free_given;
 

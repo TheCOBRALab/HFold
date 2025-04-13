@@ -17,7 +17,7 @@ extern std::string input_file;
 extern std::string output_file;
 
 // Number of Suboptimal structures to print
-extern int subopt;
+extern int suboptimal;
 
 // Number for dangle model
 extern int dangle_model;

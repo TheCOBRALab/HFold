@@ -14,7 +14,7 @@ std::string input_file;
 std::string output_file;
 std::string parameter_file;
 int dangle_model;
-int subopt;
+int suboptimal;
 
 static char *package_name = 0;
 
@@ -372,7 +372,7 @@ int cmdline_parser_internal (int argc, char **argv, struct args_info *args_info,
               &(local_args_info.subopt_given), optarg, 0, 0, ARG_NO,0, 0,"subopt", 'n',additional_error)){
             goto failure;}
 
-            subopt = strtol(optarg,NULL,10);
+            suboptimal = strtol(optarg,NULL,10);
         
           break;
         case 'r':	/* Specify restricted structure.  */
