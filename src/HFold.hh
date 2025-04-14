@@ -8,6 +8,6 @@ void get_input(std::string file, std::string &sequence, std::string &structure);
 void validateStructure(std::string sequence, std::string structure);
 void validateSequence(std::string sequence);
 void seqtoRNA(std::string &seq);
-std::string hfold(std::string seq, std::string structure, double &energy, sparse_tree &tree, bool pk_free, bool pk_only, int dangles);
+std::string hfold(std::string seq, std::string res, double &energy, sparse_tree &tree, bool pk_free, bool pk_only, int dangles);
 
 #endif // HFOLD_H
