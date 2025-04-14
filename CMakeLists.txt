@@ -4,19 +4,23 @@ project(HFold
     DESCRIPTION "RNA folding prediction tool"
 )
 
-# Set standards before targets are created
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Default to Release build if no configuration is specified
+enable_testing()
+
+add_subdirectory(googletest)
+add_subdirectory(test)
+
+# Default to Release build if not specified
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
 endif()
 
 # TODO: Find a more universal way to find the ViennaRNA library
-# Try finding vrna or RNA (common variations)
+# Locate ViennaRNA
 find_library(VIENNARNA_LIBRARY
     NAMES vrna RNA
     PATHS
@@ -30,7 +34,6 @@ find_library(VIENNARNA_LIBRARY
     DOC "Path to ViennaRNA library"
 )
 
-# Try to find ViennaRNA include directory
 find_path(VIENNARNA_INCLUDE_DIR
     NAMES ViennaRNA/fold.h
     PATHS
@@ -52,12 +55,11 @@ if(VIENNARNA_LIBRARY AND VIENNARNA_INCLUDE_DIR)
     message(STATUS "Found system ViennaRNA headers at: ${VIENNARNA_INCLUDE_DIR}")
     set(USE_SYSTEM_VIENNARNA TRUE)
 else()
-    message(FATAL_ERROR "ViennaRNA library and/or headers not found. Please install ViennaRNA and try again.(Instructions are in the README)")
+    message(FATAL_ERROR "ViennaRNA library and/or headers not found. Please install ViennaRNA and try again.")
 endif()
 
-# Organize sources using modern list structure
+# Core library sources (excluding main.cpp)
 set(hfold_sources
-    src/main.cpp
     src/W_final.cpp 
     src/pseudo_loop.cpp 
     src/HFold.cpp
@@ -68,15 +70,22 @@ set(hfold_sources
     src/sparse_tree.cpp
 )
 
-# Add the executable target
-add_executable(HFold ${hfold_sources})
-target_compile_options(HFold PRIVATE
+# Common compile options
+set(COMMON_COMPILE_OPTIONS
     $<$<CONFIG:Debug>:-g -Wall -Wextra> # cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
     $<$<CONFIG:Release>:-O3 -flto>      # cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 )
 
-include_directories(${VIENNARNA_INCLUDE_DIR})
-target_link_libraries(HFold ${VIENNARNA_LIBRARY})
+# Build the core logic as a library
+add_library(HFoldLib ${hfold_sources})
+target_include_directories(HFoldLib PUBLIC ${VIENNARNA_INCLUDE_DIR})
+target_link_libraries(HFoldLib PUBLIC ${VIENNARNA_LIBRARY})
+target_compile_options(HFoldLib PRIVATE ${COMMON_COMPILE_OPTIONS})
 
-# Installation (For Conda package)
+# Build the main executable
+add_executable(HFold src/main.cpp)
+target_link_libraries(HFold PRIVATE HFoldLib)
+target_compile_options(HFold PRIVATE ${COMMON_COMPILE_OPTIONS})
+
+# Install rule (For Conda Packaging)
 install(TARGETS HFold RUNTIME DESTINATION bin)
