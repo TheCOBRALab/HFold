@@ -1,74 +1,81 @@
 # HFold
-
-#### Description:
-Software implementation of HFold.     
 HFold is an algorithm for predicting the pseudoknotted secondary structures of RNA using strict Hierarchical Folding.
 
-#### Cite: 
-Jabbari, H., Condon, A., Pop, A., Pop, C., Zhao, Y. (2007). HFold: RNA Pseudoknotted Secondary Structure Prediction Using Hierarchical Folding. In: Giancarlo, R., Hannenhalli, S. (eds) Algorithms in Bioinformatics. WABI 2007. Lecture Notes in Computer Science, vol 4645. Springer, Berlin, Heidelberg. 
-https://doi.org/10.1007/978-3-540-74126-8_30
+## System Requirements
+HFold needs a 64bit Linux or macOS operating system to run
 
-Jabbari, H., Condon, A., Zhao Y. Novel and Efficient RNA Secondary Structure Prediction Using Hierarchical Folding.Journal of Computational Biology.Mar 2008.139-163.
-http://doi.org/10.1089/cmb.2007.0198
+### Software Requirements:
+- CMake 3.9 or greater
+- ViennaRNA 2.7.0
 
-#### Supported OS: 
-Linux 
-macOS 
+### ViennaRNA package installation
+You will need to install ViennaRNA package in order to compile HFold
 
-### Installation:  
-Requirements: A compiler that supports C++11 standard (tested with g++ version 4.7.2 or higher)  and CMake version 3.1 or greater.    
+1. Download the ViennaRNA package from [ViennaRNA-2.7.0.tar.gz](https://github.com/ViennaRNA/ViennaRNA/releases/download/v2.7.0/ViennaRNA-2.7.0.tar.gz)
 
-[CMake](https://cmake.org/install/) version 3.1 or greater must be installed in a way that HFold can find it.    
-To test if your Mac or Linux system already has CMake, you can type into a terminal:      
+
+2. Install the ViennaRNA package:
+```
+tar -zxvf ViennaRNA-2.7.0.tar.gz
+cd ViennaRNA-2.7.0
+./configure
+sudo make
+sudo make install
+```
+
+For more details, see https://github.com/ViennaRNA/ViennaRNA  
+
+### CMake installation
+
+
+[CMake](https://cmake.org/install/) version 3.9 or greater must be installed in a way that HFold can find it.    
+
+To check if your system already has CMake, run this in terminal:     
 ```
 cmake --version
 ```
-If it does not print a cmake version greater than or equal to 3.1, you will have to install CMake depending on your operating system.
+
+#### Linux:
+```
+sudo apt update
+sudo apt install cmake
+```
 
 #### Mac:    
-Easiest way is to install homebrew and use that to install CMake.    
-To do so, run the following from a terminal to install homebrew:      
+Homebrew is required to download CMake on Mac.
+Run this command to install homebrew. 
 ```  
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"   
-```    
-When that finishes, run the following from a terminal to install CMake.     
+``` 
+You may be prompted to add homebrew to PATH. If prompted, please follow the instructions presented on the terminal.
+
+Once finished, install CMake
 ```   
 brew install cmake   
 ``` 
-#### Linux:    
-Run from a terminal     
-```
-wget http://www.cmake.org/files/v3.8/cmake-3.8.2.tar.gz
-tar xzf cmake-3.8.2.tar.gz
-cd cmake-3.8.2
-./configure
-make
-make install
-```
-[Linux instructions source](https://geeksww.com/tutorials/operating_systems/linux/installation/downloading_compiling_and_installing_cmake_on_linux.php)
+
+## Install HFold
 
 #### Steps for installation   
-1. [Download the repository](https://github.com/HosnaJabbari/HFold.git) and extract the files onto your system.
+1. [Download the repository](https://github.com/TheCOBRALab/HFold) and extract the files onto your system.
 2. From a command line in the root directory (where this README.md is) run
 ```
-cmake -H. -Bbuild
+cmake -S . -B build
 cmake --build build --parallel
-```   
-If you need to specify a specific compiler, such as g++, you can instead run something like   
+``` 
+If you want to run DEBUG mode, you can run
 ```
-cmake -H. -Bbuild -DCMAKE_CXX_COMPILER=g++
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
 cmake --build build --parallel
-```   
-This can be useful if you are getting errors about your compiler not having C++11 features.
+```
 
-Help
-========================================
+## Usage
 
 ```
 Usage: HFold[options] [input sequence]
 ```
 
-Read input file from cmdline; predict minimum free energy and optimum structure using the RNA folding algorithm.
+#### Flags:
 
 
 ```
@@ -119,7 +126,7 @@ Read input file from cmdline; predict minimum free energy and optimum structure 
             GCAACGAUGACAUACAUCGCUAGUCGACGC
             (............................)
 
-#### Example:
+#### Examples:
     assume you are in the directory where the HFold executable is loacted
     ./build/HFold -i "/home/username/Desktop/myinputfile.txt"
     ./build/HFold -i "/home/username/Desktop/myinputfile.txt" -o "outputfile.txt"
@@ -146,3 +153,12 @@ Read input file from cmdline; predict minimum free energy and optimum structure 
     
 ## Questions
 For questions, you can email mateo2@ualberta.ca
+
+
+
+## Cite: 
+Jabbari, H., Condon, A., Pop, A., Pop, C., Zhao, Y. (2007). HFold: RNA Pseudoknotted Secondary Structure Prediction Using Hierarchical Folding. In: Giancarlo, R., Hannenhalli, S. (eds) Algorithms in Bioinformatics. WABI 2007. Lecture Notes in Computer Science, vol 4645. Springer, Berlin, Heidelberg. 
+https://doi.org/10.1007/978-3-540-74126-8_30
+
+Jabbari, H., Condon, A., Zhao Y. Novel and Efficient RNA Secondary Structure Prediction Using Hierarchical Folding.Journal of Computational Biology.Mar 2008.139-163.
+http://doi.org/10.1089/cmb.2007.0198

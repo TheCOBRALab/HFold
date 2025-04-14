@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.9)
 project(HFold
     LANGUAGES C CXX
     DESCRIPTION "RNA folding prediction tool"
@@ -15,6 +15,46 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
 endif()
 
+# TODO: Find a more universal way to find the ViennaRNA library
+# Try finding vrna or RNA (common variations)
+find_library(VIENNARNA_LIBRARY
+    NAMES vrna RNA
+    PATHS
+        $ENV{VIENNARNA_LIB}
+        /usr/local/lib
+        /usr/lib
+        /opt/homebrew/lib
+        /opt/vienna/lib
+        /usr/local/lib64
+        /usr/lib64
+    DOC "Path to ViennaRNA library"
+)
+
+# Try to find ViennaRNA include directory
+find_path(VIENNARNA_INCLUDE_DIR
+    NAMES ViennaRNA/fold.h
+    PATHS
+        $ENV{VIENNARNA_INC}
+        /usr/local/include
+        /usr/include
+        /opt/homebrew/include
+        /opt/vienna/include
+        /usr/local/include/ViennaRNA
+        /usr/include/ViennaRNA
+    DOC "Path to ViennaRNA headers"
+)
+
+message(STATUS "VIENNARNA_LIBRARY = ${VIENNARNA_LIBRARY}")
+message(STATUS "VIENNARNA_INCLUDE_DIR = ${VIENNARNA_INCLUDE_DIR}")
+
+if(VIENNARNA_LIBRARY AND VIENNARNA_INCLUDE_DIR)
+    message(STATUS "Found system ViennaRNA library at: ${VIENNARNA_LIBRARY}")
+    message(STATUS "Found system ViennaRNA headers at: ${VIENNARNA_INCLUDE_DIR}")
+    set(USE_SYSTEM_VIENNARNA TRUE)
+else()
+    message(FATAL_ERROR "ViennaRNA library and/or headers not found. Please install ViennaRNA and try again.(Instructions are in the README)")
+endif()
+
 # Organize sources using modern list structure
 set(hfold_sources
     src/main.cpp
@@ -28,86 +68,15 @@ set(hfold_sources
     src/sparse_tree.cpp
 )
 
-set(vienna_sources
-    # Constraints
-    src/ViennaRNA/constraints/constraints.c
-    src/ViennaRNA/constraints/hard.c
-    src/ViennaRNA/constraints/SHAPE.c
-    src/ViennaRNA/constraints/soft.c
-    
-    # Datastructures
-    src/ViennaRNA/datastructures/basic_datastructures.c
-    src/ViennaRNA/datastructures/char_stream.c
-    src/ViennaRNA/datastructures/lists.c
-    
-    # I/O
-    src/ViennaRNA/io/file_formats.c
-    src/ViennaRNA/io/io_utils.c
-    
-    # Landscape
-    src/ViennaRNA/landscape/move.c
-    
-    # Loops
-    src/ViennaRNA/loops/external_pf.c
-    src/ViennaRNA/loops/external.c
-    src/ViennaRNA/loops/hairpin.c
-    src/ViennaRNA/loops/internal.c
-    src/ViennaRNA/loops/multibranch.c
-    
-    # Parameters
-    src/ViennaRNA/params/default.c
-    src/ViennaRNA/params/params.c
-    src/ViennaRNA/params/io.c
-    
-    # Utilities
-    src/ViennaRNA/utils/cpu.c
-    src/ViennaRNA/utils/higher_order_functions.c
-    src/ViennaRNA/utils/string_utils.c
-    src/ViennaRNA/utils/structure_utils.c
-    src/ViennaRNA/utils/utils.c
-    
-    # Core ViennaRNA
-    src/ViennaRNA/alphabet.c
-    src/ViennaRNA/boltzmann_sampling.c
-    src/ViennaRNA/centroid.c
-    src/ViennaRNA/cofold.c
-    src/ViennaRNA/commands.c
-    src/ViennaRNA/dp_matrices.c
-    src/ViennaRNA/equilibrium_probs.c
-    src/ViennaRNA/eval.c
-    src/ViennaRNA/fold_compound.c
-    src/ViennaRNA/fold.c
-    src/ViennaRNA/gquad.c
-    src/ViennaRNA/grammar.c
-    src/ViennaRNA/MEA.c
-    src/ViennaRNA/mfe.c
-    src/ViennaRNA/mm.c
-    src/ViennaRNA/model.c
-    src/ViennaRNA/part_func.c
-    src/ViennaRNA/ribo.c
-    src/ViennaRNA/sequence.c
-    src/ViennaRNA/subopt.c
-    src/ViennaRNA/unstructured_domains.c
-)
-
-# RNA static library (ViennaRNA)
-add_library(RNA STATIC ${vienna_sources})
-target_include_directories(RNA PUBLIC 
-    src
-)
-
-target_compile_options(RNA PRIVATE
-    $<$<CONFIG:Debug>:-g -Wall -Wextra>
-    $<$<CONFIG:Release>:-O3 -flto>
-)
-
-# HFold executable
+# Add the executable target
 add_executable(HFold ${hfold_sources})
-target_link_libraries(HFold PRIVATE RNA)
 target_compile_options(HFold PRIVATE
-    $<$<CONFIG:Debug>:-g -Wall -Wextra> # cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Debug
-    $<$<CONFIG:Release>:-O3 -flto>      # cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release
+    $<$<CONFIG:Debug>:-g -Wall -Wextra> # cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
+    $<$<CONFIG:Release>:-O3 -flto>      # cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 )
+
+include_directories(${VIENNARNA_INCLUDE_DIR})
+target_link_libraries(HFold ${VIENNARNA_LIBRARY})
 
 # Installation (For Conda package)
 install(TARGETS HFold RUNTIME DESTINATION bin)
