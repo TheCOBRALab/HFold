@@ -18,12 +18,15 @@ You will need to install ViennaRNA package in order to compile HFold
 ```
 tar -zxvf ViennaRNA-2.7.0.tar.gz
 cd ViennaRNA-2.7.0
-./configure
+./configure --without-perl
 sudo make
 sudo make install
 ```
+**Tip:** To speed up compilation, you can parallelize compilation by replacing the `sudo make` command.:
+- Linux: Use `sudo make -j$(nproc)`
+- macOS: Use `sudo make -j$(sysctl -n hw.ncpu)`
 
-For more details, see https://github.com/ViennaRNA/ViennaRNA  
+For more details about ViennaRNA, see https://github.com/ViennaRNA/ViennaRNA  
 
 ### CMake installation
 
