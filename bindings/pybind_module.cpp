@@ -41,7 +41,7 @@ namespace   // ← keeps the symbol local to this TU
 /*───────────────────────────────────────────────────────────
   Pybind11 module definition
 ───────────────────────────────────────────────────────────*/
-PYBIND11_MODULE(hfold_cpp, m)
+PYBIND11_MODULE(hfold, m)
 {
     m.doc() = "HFold minimal Python bindings";
 
