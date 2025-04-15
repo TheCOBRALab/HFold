@@ -17,9 +17,9 @@
 
  // This is the V matrix
 
-#include "constants.hh"
-#include "h_struct.hh"
-#include "h_externs.hh"
+#include "constants.hpp"
+#include "h_struct.hpp"
+#include "h_externs.hpp"
 
 #include <stdio.h>
 #include <string.h>
@@ -27,7 +27,7 @@
 #include <string>
 #include <algorithm>
 
-#include "s_energy_matrix.hh"
+#include "s_energy_matrix.hpp"
 
 
 

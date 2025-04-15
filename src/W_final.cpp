@@ -1,6 +1,6 @@
-#include "W_final.hh"
-#include "h_struct.hh"
-#include "h_externs.hh"
+#include "W_final.hpp"
+#include "h_struct.hpp"
+#include "h_externs.hpp"
 
 #include <stdio.h>
 #include <math.h>

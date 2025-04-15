@@ -1,9 +1,9 @@
 // Iterative HFold files
-#include "hotspot.hh"
-#include "Result.hh"
-#include "cmdline.hh"
-#include "W_final.hh"
-#include "h_globals.hh"
+#include "hotspot.hpp"
+#include "Result.hpp"
+#include "cmdline.hpp"
+#include "W_final.hpp"
+#include "h_globals.hpp"
 // a simple driver for the HFold
 #include <iostream>
 #include <fstream>

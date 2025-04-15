@@ -1,11 +1,11 @@
 #ifndef PSEUDO_LOOP_H_
 #define PSEUDO_LOOP_H_
-#include "base_types.hh"
-#include "h_struct.hh"
-#include "constants.hh"
+#include "base_types.hpp"
+#include "h_struct.hpp"
+#include "constants.hpp"
 #include <stdio.h>
 #include <string.h>
-#include "s_energy_matrix.hh"
+#include "s_energy_matrix.hpp"
 
 class VM_final;
 class V_final;

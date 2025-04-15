@@ -1,6 +1,6 @@
 #ifndef HFOLD_H
 #define HFOLD_H
-#include "sparse_tree.hh"
+#include "sparse_tree.hpp"
 #include <string>
 
 bool exists (const std::string path);
