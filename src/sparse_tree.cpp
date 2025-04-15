@@ -1,4 +1,4 @@
-#include "sparse_tree.hh"
+#include "sparse_tree.hpp"
 #include <iomanip>
 #include <vector>
 

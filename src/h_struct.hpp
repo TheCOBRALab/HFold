@@ -1,7 +1,7 @@
 #ifndef H_STRUCT_H_
 #define H_STRUCT_H_
 
-#include "constants.hh"
+#include "constants.hpp"
 #include <vector>
 
 // the data structure stored in the V array

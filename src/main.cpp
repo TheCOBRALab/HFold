@@ -1,7 +1,7 @@
-#include "Result.hh"
-#include "cmdline.hh"
-#include "W_final.hh"
-#include "HFold.hh"
+#include "Result.hpp"
+#include "cmdline.hpp"
+#include "W_final.hpp"
+#include "HFold.hpp"
 
 #include <iostream>
 #include <fstream>

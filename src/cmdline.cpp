@@ -1,4 +1,4 @@
-#include "cmdline.hh"
+#include "cmdline.hpp"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

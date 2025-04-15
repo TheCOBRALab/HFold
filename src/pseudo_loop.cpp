@@ -1,5 +1,5 @@
-#include "pseudo_loop.hh"
-#include "h_externs.hh"
+#include "pseudo_loop.hpp"
+#include "h_externs.hpp"
 #include <stdio.h>
 #include <string>
 #include <stdlib.h>

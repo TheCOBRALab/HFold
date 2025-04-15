@@ -1,12 +1,12 @@
 #ifndef W_FINAL_H_
 #define W_FINAL_H_
 
-#include "hotspot.hh"
-#include "pseudo_loop.hh"
-#include "base_types.hh"
-#include "sparse_tree.hh"
-#include "s_energy_matrix.hh"
-#include "constants.hh"
+#include "hotspot.hpp"
+#include "pseudo_loop.hpp"
+#include "base_types.hpp"
+#include "sparse_tree.hpp"
+#include "s_energy_matrix.hpp"
+#include "constants.hpp"
 #include <cstring>
 #include <string>
 #include <vector>

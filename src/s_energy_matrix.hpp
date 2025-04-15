@@ -20,8 +20,8 @@
 #ifndef ENERGY_MATRIX_H
 #define ENERGY_MATRIX_H
 
-#include "base_types.hh"
-#include "sparse_tree.hh"
+#include "base_types.hpp"
+#include "sparse_tree.hpp"
 #include <string>
 #include <vector>
 

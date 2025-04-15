@@ -3,8 +3,8 @@
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>           // std::pair ⇆ Python tuple
-#include "HFold.hh"                 // real core routine
-#include "sparse_tree.hh"           // whatever defines sparse_tree
+#include "HFold.hpp"                 // real core routine
+#include "sparse_tree.hpp"           // whatever defines sparse_tree
 
 namespace py = pybind11;
 

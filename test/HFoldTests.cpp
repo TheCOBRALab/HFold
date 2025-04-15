@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 #include <string.h>
-#include "../src/HFold.hh"
-#include "../src/sparse_tree.hh"
-#include "../src/W_final.hh"
+#include "../src/HFold.hpp"
+#include "../src/sparse_tree.hpp"
+#include "../src/W_final.hpp"
 
 
 void load_parameters(std::string param_file){
