@@ -26,9 +26,9 @@
 #include <vector>
 
 extern "C" {
-#include "ViennaRNA/pair_mat.h"
-#include "ViennaRNA/loops/all.h"
-#include "ViennaRNA/params/io.h"
+    #include <ViennaRNA/pair_mat.h>
+    #include <ViennaRNA/loops/all.h>
+    #include <ViennaRNA/params/io.h>
 }
 
 

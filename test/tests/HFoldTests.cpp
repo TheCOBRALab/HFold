@@ -1,10 +1,9 @@
 #include <gtest/gtest.h>
 #include <string.h>
 #include <tuple>
-#include "../src/HFold.hpp"
-#include "../src/sparse_tree.hpp"
-#include "../src/W_final.hpp"
-
+#include <HFold.hpp>
+#include <sparse_tree.hpp>
+#include <W_final.hpp>
 
 void load_parameters(std::string param_file){
     if (exists(param_file)) {

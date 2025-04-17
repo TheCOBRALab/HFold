@@ -10,22 +10,34 @@ VERSION = "1.0.0"
 DESCRIPTION = "HFold: A Python wrapper for the HFold C++ library"
 
 here = os.path.abspath(os.path.dirname(__file__))
+home = os.path.abspath(os.path.join(here, "../"))
+src_dir = os.path.join(home, "src")
+bindings_dir = os.path.join(home, "bindings")
 
 # Read the contents of your README file to use as the long description
 with codecs.open(os.path.join(here, "../README.md"), encoding="utf-8") as fh:
     long_description = "\n" + fh.read()
 
-hfold_sources = [
-    "../src/W_final.cpp",
-    "../src/pseudo_loop.cpp",
-    "../src/HFold.cpp",
-    "../src/cmdline.cpp",
-    "../src/Result.cpp",
-    "../src/s_energy_matrix.cpp",
-    "../src/Hotspot.cpp",
-    "../src/sparse_tree.cpp",
-    "bindings/pybind_module.cpp"
+
+hfold_sources = [os.path.join(src_dir, f) for f in [
+    "W_final.cpp",
+    "pseudo_loop.cpp",
+    "HFold.cpp",
+    "cmdline.cpp",
+    "Result.cpp",
+    "s_energy_matrix.cpp",
+    "Hotspot.cpp",
+    "sparse_tree.cpp"
+    ]
 ]
+
+binding_sources = [
+    os.path.join(bindings_dir, f) for f in [
+    "pybind_module.cpp"
+    ]
+]
+
+sources = hfold_sources + binding_sources
 
 vienna_lib = os.environ.get("VIENNARNA_LIB")
 
@@ -51,10 +63,10 @@ if not vienna_lib:
 ext_modules = [
     Extension(
         "hfold",
-        hfold_sources,
+        sources,
         language="c++",
         include_dirs=[
-            os.path.join(here, "src"),
+            os.path.join(here, "../src"),
             os.path.join(here, "bindings"),
             pybind11.get_include(),
             pybind11.get_include(user=True),
