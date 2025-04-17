@@ -10,9 +10,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 enable_testing()
-
-add_subdirectory(googletest)
 add_subdirectory(test)
+add_subdirectory(test/googletest)
 
 # Default to Release build if not specified
 if(NOT CMAKE_BUILD_TYPE)
