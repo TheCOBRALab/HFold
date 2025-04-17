@@ -3,9 +3,9 @@
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>            // std::pair ⇆ Python tuple
-#include "../../src/HFold.hpp"
-#include "../../src/sparse_tree.hpp"
-#include "../../src/W_final.hpp"
+#include <HFold.hpp>
+#include <sparse_tree.hpp>
+#include <W_final.hpp>
 
 namespace py = pybind11;
 
