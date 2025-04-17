@@ -10,6 +10,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest, macos-13]
+        build_type: [Release]
 
     steps:
       - uses: actions/checkout@v3
@@ -23,7 +24,19 @@ jobs:
           channels: conda-forge, defaults
           channel-priority: strict
           architecture: ${{ runner.arch == 'ARM64' && 'arm64' || 'x64' }}
+        
+          
+      - name: Install ViennaRNA
+        run: |
+          curl -L -O https://github.com/ViennaRNA/ViennaRNA/releases/download/v2.7.0/ViennaRNA-2.7.0.tar.gz
+          tar -xzf ViennaRNA-2.7.0.tar.gz
+          cd ViennaRNA-2.7.0
+          ./configure --without-perl
+          CORES=$(nproc || sysctl -n hw.ncpu)
+          sudo make -j$CORES
+          sudo make install -j$CORES
 
+          
       - name: Install conda-build & anaconda-client
         run: |
           if [[ "$RUNNER_OS" == "macOS" ]]; then

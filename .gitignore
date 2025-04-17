@@ -40,3 +40,9 @@ bash.sh
 
 # virtual environment
 venv/
+
+# Makefiles and tests
+/CMakeFiles/
+/test/CMakeFiles/
+/test/Makefile
+

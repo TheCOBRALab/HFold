@@ -1,4 +1,3 @@
-from setuptools import setup, Extension
 import os
 import pybind11
 from pybind11.setup_helpers import build_ext
@@ -13,21 +12,41 @@ DESCRIPTION = "HFold: A Python wrapper for the HFold C++ library"
 here = os.path.abspath(os.path.dirname(__file__))
 
 # Read the contents of your README file to use as the long description
-with codecs.open(os.path.join(here, "README.md"), encoding="utf-8") as fh:
+with codecs.open(os.path.join(here, "../README.md"), encoding="utf-8") as fh:
     long_description = "\n" + fh.read()
 
 hfold_sources = [
-    "src/W_final.cpp",
-    "src/pseudo_loop.cpp",
-    "src/HFold.cpp",
-    "src/cmdline.cpp",
-    "src/Result.cpp",
-    "src/s_energy_matrix.cpp",
-    "src/Hotspot.cpp",
-    "src/sparse_tree.cpp",
-    "src/main.cpp",
+    "../src/W_final.cpp",
+    "../src/pseudo_loop.cpp",
+    "../src/HFold.cpp",
+    "../src/cmdline.cpp",
+    "../src/Result.cpp",
+    "../src/s_energy_matrix.cpp",
+    "../src/Hotspot.cpp",
+    "../src/sparse_tree.cpp",
     "bindings/pybind_module.cpp"
 ]
+
+vienna_lib = os.environ.get("VIENNARNA_LIB")
+
+if not vienna_lib:
+    for lib in [
+        "/usr/local/lib",
+        "/usr/lib",
+        "/opt/homebrew/lib",
+        "/opt/vienna/lib",
+        "/usr/local/lib64",
+        "/usr/lib64",
+        ]:
+         if os.path.exists(os.path.join(lib, "libRNA.so")) or \
+            os.path.exists(os.path.join(lib, "libRNA.dylib")) or \
+            os.path.exists(os.path.join(lib, "libRNA.a")):
+            vienna_lib = lib
+            print(f"ViennaRNA library found at {vienna_lib}")
+            break
+    if not vienna_lib:
+        # If ViennaRNA is not found in common locations, raise an error
+        raise RuntimeError("Please set VIENNARNA_LIB environment variables")
 
 ext_modules = [
     Extension(
@@ -40,10 +59,10 @@ ext_modules = [
             pybind11.get_include(),
             pybind11.get_include(user=True),
         ],
+        library_dirs=[vienna_lib],
+        libraries=["RNA"],
         extra_compile_args=["-O3", "-std=c++17", "-DHAVE_STRDUP=1"],
-        extra_link_args=[
-        "-lRNA",                  # <--- this links against ViennaRNA
-    ]
+
     )
 ]
 
@@ -83,7 +102,7 @@ setup(
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
-        "Programming Language :: Python :: 3.13"
+        "Programming Language :: Python :: 3.13",
         "Operating System :: MacOS",
         "Operating System :: Unix",
     ],
