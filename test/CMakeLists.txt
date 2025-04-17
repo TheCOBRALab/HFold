@@ -16,7 +16,6 @@ target_link_libraries(${TEST_TARGET} PUBLIC
 
 target_include_directories(${TEST_TARGET} PRIVATE ${CMAKE_SOURCE_DIR}/src)
 
-
 gtest_discover_tests(${TEST_TARGET}
     DISCOVERY_MODE PRE_TEST
     EXTRA_ARGS --gtest_color=yes
