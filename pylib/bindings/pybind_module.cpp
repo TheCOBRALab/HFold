@@ -37,7 +37,7 @@ namespace bindings
     std::pair<std::string, double>
     hfold_simple(std::string sequence,
                  std::string constraint = "",
-                 const std::string &param_file = "./params/rna_DirksPierce09.par")
+                 const std::string &param_file = "")
     {   
         /** 
         * @brief Predict a single RNA secondary structure using HFold with optional constraints.
@@ -49,7 +49,7 @@ namespace bindings
         * @param sequence The nucleotide sequence to fold. Can include A, C, G, U (or T, which will be converted to U).
         * @param constraint Optional dot-bracket structure constraint. Must be the same length as the sequence. 
         *                   If omitted, all positions are considered unpaired.
-        * @param param_file Path to a ViennaRNA parameter file. Default is "./params/rna_DirksPierce09.par".
+        * @param param_file Optional path to a ViennaRNA parameter file.
         */
         validateSequence(sequence);
         seqtoRNA(sequence);
@@ -61,20 +61,33 @@ namespace bindings
             constraint = std::string(sequence.length(), '.');
         }
 
-        helpers::load_parameters(param_file);
+        if (!param_file.empty()) {
+            helpers::load_parameters(param_file);
+        }
 
-        // get size of the sequence
+        // get size of the sequence to allocate the sparse tree
         const int n = static_cast<int>(sequence.size());
-
         sparse_tree tree(constraint, n);
 
         double energy = 0.0;
+        bool pk_free = false;
+        bool pk_only = false;
+        int dangles = 2;
+
         std::string final_structure =
-            hfold(sequence, constraint, energy,
+            hfold(sequence,
+                  constraint,
+                  energy,
                   tree,
-                  /*pk_free =*/false,
-                  /*pk_only =*/false,
-                  /*dangles =*/2);
+                  pk_free,
+                  pk_only,
+                  dangles);
+        
+        // If it takes energy to fold, it's best to not fold
+        if (energy > 0.0) {
+            energy = 0.0;
+            constraint = std::string(sequence.length(), '.');
+        }
 
         return {final_structure, energy};
     }
@@ -87,12 +100,11 @@ namespace bindings
 PYBIND11_MODULE(hfold, m)
 {
     m.doc() = "HFold minimal Python bindings";
-
     m.def("hfold",
           &bindings::hfold_simple,
           py::arg("sequence"),
           py::arg("structure") = "",
-          py::arg("param_file") = "./params/rna_DirksPierce09.par",
+          py::arg("param_file") = "",
           R"pbdoc(
               Fold an RNA/DNA sequence.
 
@@ -101,9 +113,9 @@ PYBIND11_MODULE(hfold, m)
               sequence : str
                   Nucleotide sequence (A,C,G,U/T).
               structure : str, optional
-                  Dot‑bracket restriction; must match sequence length.
+                  Dot-bracket restriction; must match sequence length.
               param_file : str, optional
-                  Path to parameter file (default: "../../params/rna_DirksPierce09.par").
+                  Path to parameter file
 
               Returns
               -------
