@@ -91,8 +91,8 @@ int main (int argc, char *argv[])
 	for(int i = 0;i<size;++i){
 		double energy;
 		std::string structure = hotspot_list[i].get_structure();
-
-		sparse_tree tree(structure,n);
+		std::cout << "structure: " <<structure << std::endl;
+		sparse_tree tree(structure, n);
 		std::string final_structure = hfold(seq,structure, energy,tree,pk_free,pk_only, dangles);
 		
 		Result result(seq,hotspot_list[i].get_structure(),hotspot_list[i].get_energy(),final_structure,energy);

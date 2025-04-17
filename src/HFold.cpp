@@ -76,7 +76,26 @@ std::string hfold(std::string seq,std::string res, double &energy, sparse_tree &
 }
 
 void seqtoRNA(std::string &sequence){
+	/**
+	 * @brief Converts a DNA sequence to RNA by replacing T with U.
+	 * 
+	 * This function modifies the input string in-place and logs the 
+	 * conversion if any T's are found.
+	 * 
+	 * @param sequence The DNA sequence to be converted (e.g. "ATCGT").
+	 *                 The result (RNA) will be stored in the same string.
+	 */
+	bool isRNA = true;
+	std::string original_sequence = sequence;
     for (char &c : sequence) {
-      	if (c == 'T') c = 'U';
+      	if (c == 'T') {
+			c = 'U';
+			isRNA = false;
+		}
     }
+	if(!isRNA){
+		std::cout << "Input sequence contains T's, converting to U's" << std::endl;
+		std::cout << "Original sequence: " << original_sequence << std::endl;
+		std::cout << "Converted sequence: " << sequence << std::endl;
+	}
 }

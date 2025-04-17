@@ -19,8 +19,7 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
 endif()
 
-# TODO: Find a more universal way to find the ViennaRNA library
-# Locate ViennaRNA
+# Locate ViennaRNA library
 find_library(VIENNARNA_LIBRARY
     NAMES vrna RNA
     PATHS
@@ -34,28 +33,12 @@ find_library(VIENNARNA_LIBRARY
     DOC "Path to ViennaRNA library"
 )
 
-find_path(VIENNARNA_INCLUDE_DIR
-    NAMES ViennaRNA/fold.h
-    PATHS
-        $ENV{VIENNARNA_INC}
-        /usr/local/include
-        /usr/include
-        /opt/homebrew/include
-        /opt/vienna/include
-        /usr/local/include/ViennaRNA
-        /usr/include/ViennaRNA
-    DOC "Path to ViennaRNA headers"
-)
-
 message(STATUS "VIENNARNA_LIBRARY = ${VIENNARNA_LIBRARY}")
-message(STATUS "VIENNARNA_INCLUDE_DIR = ${VIENNARNA_INCLUDE_DIR}")
 
-if(VIENNARNA_LIBRARY AND VIENNARNA_INCLUDE_DIR)
+if(VIENNARNA_LIBRARY)
     message(STATUS "Found system ViennaRNA library at: ${VIENNARNA_LIBRARY}")
-    message(STATUS "Found system ViennaRNA headers at: ${VIENNARNA_INCLUDE_DIR}")
-    set(USE_SYSTEM_VIENNARNA TRUE)
 else()
-    message(FATAL_ERROR "ViennaRNA library and/or headers not found. Please install ViennaRNA and try again.")
+    message(FATAL_ERROR "ViennaRNA library not found. Please install ViennaRNA and try again.")
 endif()
 
 # Core library sources (excluding main.cpp)
@@ -76,9 +59,8 @@ set(COMMON_COMPILE_OPTIONS
     $<$<CONFIG:Release>:-O3 -flto>      # cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 )
 
-# Build the core logic as a library
+# Build the core logic as a library (Useful for testing)
 add_library(HFoldLib ${hfold_sources})
-target_include_directories(HFoldLib PUBLIC ${VIENNARNA_INCLUDE_DIR})
 target_link_libraries(HFoldLib PUBLIC ${VIENNARNA_LIBRARY})
 target_compile_options(HFoldLib PRIVATE ${COMMON_COMPILE_OPTIONS})
 
