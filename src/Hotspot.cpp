@@ -1,4 +1,4 @@
-#include "hotspot.hpp"
+#include "Hotspot.hpp"
 
 //getters
 int Hotspot::get_left_inner_index() const{

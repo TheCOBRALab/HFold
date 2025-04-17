@@ -4,9 +4,10 @@
 #include <HFold.hpp>
 #include <sparse_tree.hpp>
 #include <W_final.hpp>
+#include <filesystem>
 
 void load_parameters(std::string param_file){
-    if (exists(param_file)) {
+    if (std::filesystem::exists(param_file)) {
         vrna_params_load(param_file.c_str(), VRNA_PARAMETER_FORMAT_DEFAULT);
     } else {
         FAIL() << "Parameter file not found: " << param_file;

@@ -6,6 +6,7 @@
 #include <HFold.hpp>
 #include <sparse_tree.hpp>
 #include <W_final.hpp>
+#include <filesystem>
 
 namespace py = pybind11;
 
@@ -16,7 +17,7 @@ namespace py = pybind11;
 namespace bindings::helpers
 {
     vrna_param_s* load_parameters(std::string param_file){
-        if (exists(param_file)) {
+        if (std::filesystem::exists(param_file)) {
             vrna_params_load(param_file.c_str(), VRNA_PARAMETER_FORMAT_DEFAULT);
         } else {
             throw std::runtime_error("Parameter file not found: " + param_file);

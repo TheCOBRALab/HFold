@@ -1,7 +1,7 @@
 #ifndef W_FINAL_H_
 #define W_FINAL_H_
 
-#include "hotspot.hpp"
+#include "Hotspot.hpp"
 #include "pseudo_loop.hpp"
 #include "base_types.hpp"
 #include "sparse_tree.hpp"
