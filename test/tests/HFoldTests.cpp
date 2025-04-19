@@ -6,73 +6,79 @@
 #include <W_final.hpp>
 #include <filesystem>
 
-void load_parameters(std::string param_file){
-    if (std::filesystem::exists(param_file)) {
-        vrna_params_load(param_file.c_str(), VRNA_PARAMETER_FORMAT_DEFAULT);
-    } else {
-        FAIL() << "Parameter file not found: " << param_file;
-    }
-
-    // Scale parameters (matches main behavior)
-    vrna_param_s* params = scale_parameters();
-}
-
 struct FoldResult {
-    std::string final_structure;
+    std::string name;
+    std::string sequence;
+    std::string structure;
     double energy;
+    
 };
 
-FoldResult simple_hfold(std::string seq, std::string structure, double energy = 0.0, sparse_tree* tree = nullptr, bool pk_free = false, bool pk_only = false, int dangles = 2){
-    load_parameters("../../params/rna_DirksPierce09.par");
-    sparse_tree local_tree(structure, seq.length());
+std::vector<std::vector<Result>> hfold_test(
+    std::string sequence = "",
+    std::string restricted = "",
+    double energy = 0.0,
+    sparse_tree* tree = nullptr,
+    bool pk_free = false,
+    bool pk_only = false,
+    int dangles = 2,
+    int suboptCount = 1,
+    std::string fileI = "",
+    std::string fileO= "",
+    std::string paramFile = "../../params/rna_DirksPierce09.par",
+    bool noConv_given = false
+){  
+    if (!fileI.empty()) fileI = "./input/" + fileI;
+    if (!fileO.empty()) fileO = "./output/" + fileI;
+    bool input_structure_given = !restricted.empty();
 
-    // if the tree is not provided, create a new one
-    if (tree == nullptr) {
-        tree = &local_tree;
+
+    std::vector<RNAEntry> inputs = get_all_inputs(fileI, sequence, restricted);
+    std::vector<std::vector<Result>> all_results;
+    for (RNAEntry current : inputs){
+        preprocess_sequence(current.sequence, current.structure, noConv_given);
+        load_energy_parameters(paramFile, current.sequence);
+        std::vector<Hotspot> hotspots = build_hotspots(current.sequence, current.structure, suboptCount);
+        std::vector<Result>  results  = fold_hotspots(current.sequence, hotspots, pk_free, pk_only, dangles, input_structure_given);
+        output_results(current.sequence, results, fileO, suboptCount, current.name, inputs.size());
+        all_results.push_back(results);
     }
-
-    std::string final_structure = hfold(seq, structure, energy, *tree, pk_free, pk_only, dangles);
-    return FoldResult{final_structure, energy};
+    return all_results;
 }
 
 TEST(SimpleHFold, ZeroSequence){
-    std::string seq = "AUGCUAGC";
-    std::string structure = "..........";
-    FoldResult result = simple_hfold(seq, structure);
-    EXPECT_EQ(result.final_structure, "........");
-    EXPECT_EQ(result.energy, 0);
+    std::string sequence = "AUGCUAGC";
+    Result result = hfold_test(sequence)[0][0];
+    EXPECT_EQ(result.get_final_structure(), "........");
+    EXPECT_EQ(result.get_final_energy(), 0);
 }
 
-TEST(SimpleHFold, Positive){
-    std::string seq = "AAAAGGAAUUUC";
-    std::string structure = ".(((....))).";
-    FoldResult result = simple_hfold(seq, structure);
-    EXPECT_EQ(result.final_structure, ".(((....))).");
-    EXPECT_EQ(result.energy, 0.87);
+TEST(SimpleHFold, Positive){ // Normally positive, but is converted to 0
+    std::string sequence = "AAAAGGAAUUUC";
+    Result result = hfold_test(sequence)[0][0];
+    EXPECT_EQ(result.get_final_structure(), "............");
+    EXPECT_EQ(result.get_final_energy(), 0);
 }
 
 TEST(SimpleHFold, Knotted){
     std::string seq = "AGGGCUAUCCUU";
-    std::string structure = "((((...)))).";
-    FoldResult result = simple_hfold(seq, structure);
-    EXPECT_EQ(result.final_structure, "((((..[))))]");
-    EXPECT_EQ(result.energy, -0.49);
+    Result result = hfold_test(seq)[0][0];
+    EXPECT_EQ(result.get_final_structure(), "((((..[))))]");
+    EXPECT_EQ(result.get_final_energy(), -0.49);
 }
 
 TEST(SimpleHFold, KnottedNotDensity2){
-    std::string seq = "CCCCCCCCCCAAAAAAGGGGGAAAGGGGGGGGGGAAAAGGGGGGGGGGAAAAAAAACCCCCAAAAAACCCCCCCCCC";
-    std::string structure = "........................((((((((((.................................))))))))))";
-    FoldResult result = simple_hfold(seq, structure);
-    EXPECT_EQ(result.final_structure, "....(((((.......)))))...((((((((((......(((((...........)))))......))))))))))");
-    EXPECT_EQ(result.energy, -32.4);
+    std::string sequence = "CCCCCCCCCCAAAAAAGGGGGAAAGGGGGGGGGGAAAAGGGGGGGGGGAAAAAAAACCCCCAAAAAACCCCCCCCCC";
+    Result result = hfold_test(sequence)[0][0];
+    EXPECT_EQ(result.get_final_structure(), "....(((((.......)))))...((((((((((......(((((...........)))))......))))))))))");
+    EXPECT_EQ(result.get_final_energy(), -32.4);
 }
 
 TEST(SimpleHFold, Unknotted){
-    std::string seq = "CCAAGGAAGGCCAA";
-    std::string structure = "................";
-    FoldResult result = simple_hfold(seq, structure);
-    EXPECT_EQ(result.final_structure, "....((....))..");
-    EXPECT_EQ(result.energy, -1.48);
+    std::string sequence = "CCAAGGAAGGCCAA";
+    Result result = hfold_test(sequence)[0][0];
+    EXPECT_EQ(result.get_final_structure(), "....((....))..");
+    EXPECT_EQ(result.get_final_energy(), -1.48);
 }
 
 

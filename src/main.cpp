@@ -16,7 +16,7 @@ int main(int argc, char* argv[]) {
 
 	/* ────── Command‑line → variables ────── */
     std::string sequence   = getSequence(a);
-    std::string restricted = a.input_structure_given ? input_struct   : "";
+    std::string restricted = a.input_structure_given ? input_struct   : ""; // Initial structure
     std::string fileI      = a.input_file_given      ? input_file     : "";
     std::string fileO      = a.output_file_given     ? output_file    : "";
     int suboptCount        = a.subopt_given          ? suboptimal     : 1;

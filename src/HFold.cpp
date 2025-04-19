@@ -213,6 +213,8 @@ void load_energy_parameters(const std::string& paramFile, const std::string& seq
         vrna_params_load(paramFile.c_str(), VRNA_PARAMETER_FORMAT_DEFAULT);
     } else if (seq.find('T') != std::string::npos) { // if T is present, load DNA parameters
         vrna_params_load_DNA_Mathews2004();
+    } else {
+        std::cerr << "Error: Input file not found: " << paramFile << std::endl;
     }
 }
 
