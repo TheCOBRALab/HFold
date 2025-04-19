@@ -45,4 +45,5 @@ venv/
 /CMakeFiles/
 /test/CMakeFiles/
 /test/Makefile
+/Testing/
 
