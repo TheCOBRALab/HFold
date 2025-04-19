@@ -1,20 +1,61 @@
 name: Conda Build & Upload
 
 on:
-  release:
-    types: [published]
+  workflow_dispatch:
+  release: { types: [published] }
+
+env:
+  VIENNARNA_VERSION: "2.7.0"
+  VIENNARNA_PREFIX: "${{ github.workspace }}/viennarna"
 
 jobs:
   build:
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest, macos-13]
         build_type: [Release]
+        include:
+          - { os: ubuntu-latest   , c_compiler: gcc  , cpp_compiler: g++      }
+          - { os: ubuntu-24.04-arm, c_compiler: gcc  , cpp_compiler: g++      }
+          - { os: macos-latest    , c_compiler: clang, cpp_compiler: clang++  }
+          - { os: macos-13        , c_compiler: clang, cpp_compiler: clang++  }
 
     steps:
       - uses: actions/checkout@v3
+          
+# -------------------- ViennaRNA --------------------
+      - name: Restore ViennaRNA from cache
+        id: cache-viennarna
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.VIENNARNA_PREFIX }}
+          key: viennarna-${{ env.VIENNARNA_VERSION }}-${{ runner.os }}-${{ runner.arch }}
 
+      - name: Build & install ViennaRNA
+        if: steps.cache-viennarna.outputs.cache-hit != 'true'
+        run: |
+          curl -L -O https://github.com/ViennaRNA/ViennaRNA/releases/download/v${VIENNARNA_VERSION}/ViennaRNA-${VIENNARNA_VERSION}.tar.gz
+          tar -xzf ViennaRNA-${VIENNARNA_VERSION}.tar.gz
+          cd ViennaRNA-${VIENNARNA_VERSION}
+          ./configure --without-perl --prefix="${VIENNARNA_PREFIX}"
+          CORES=$(nproc 2>/dev/null || sysctl -n hw.ncpu)
+          make -j"$CORES"
+          make install -j"$CORES"
+
+      # Expose headers & libs to the compiler / linker / CMake
+      - name: Export ViennaRNA paths
+        shell: bash
+        run: |
+          echo "VIENNARNA_LIB=${VIENNARNA_PREFIX}/lib"                                          >>"$GITHUB_ENV"
+          echo "CPATH=${VIENNARNA_PREFIX}/include:$CPATH"                                       >>"$GITHUB_ENV"
+          echo "LIBRARY_PATH=${VIENNARNA_PREFIX}/lib:$LIBRARY_PATH"                             >>"$GITHUB_ENV"
+          echo "CMAKE_PREFIX_PATH=${VIENNARNA_PREFIX}"                                          >>"$GITHUB_ENV"
+          echo "LD_LIBRARY_PATH=${VIENNARNA_PREFIX}/lib:$LD_LIBRARY_PATH"                       >>"$GITHUB_ENV"
+          echo "DYLD_FALLBACK_LIBRARY_PATH=${VIENNARNA_PREFIX}/lib:$DYLD_FALLBACK_LIBRARY_PATH" >>"$GITHUB_ENV"
+
+# -------------------- Conda Installation --------------------
       - name: Set up Miniconda
         uses: conda-incubator/setup-miniconda@v2
         with:
@@ -24,19 +65,7 @@ jobs:
           channels: conda-forge, defaults
           channel-priority: strict
           architecture: ${{ runner.arch == 'ARM64' && 'arm64' || 'x64' }}
-        
-          
-      - name: Install ViennaRNA
-        run: |
-          curl -L -O https://github.com/ViennaRNA/ViennaRNA/releases/download/v2.7.0/ViennaRNA-2.7.0.tar.gz
-          tar -xzf ViennaRNA-2.7.0.tar.gz
-          cd ViennaRNA-2.7.0
-          ./configure --without-perl
-          CORES=$(nproc || sysctl -n hw.ncpu)
-          sudo make -j$CORES
-          sudo make install -j$CORES
 
-          
       - name: Install conda-build & anaconda-client
         run: |
           if [[ "$RUNNER_OS" == "macOS" ]]; then
@@ -53,13 +82,12 @@ jobs:
             conda install -y conda-build anaconda-client
           fi
 
-
+# -------------------- Build --------------------
       - name: Build Conda Package
         env:
           CONDA_BLD_PATH: /tmp/bld
         run: |
           mkdir -p "$CONDA_BLD_PATH"
-          
           conda build ./conda_recipe \
           --croot /tmp/bld 
 

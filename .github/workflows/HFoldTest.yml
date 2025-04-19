@@ -1,63 +1,66 @@
-# This starter workflow is for a CMake project running on multiple platforms. There is a different starter workflow if you just want a single platform.
-# See: https://github.com/actions/starter-workflows/blob/main/ci/cmake-single-platform.yml
 name: CMake on multiple platforms
 
 on:
-  push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+  push:         { branches: [master, python] }
+  pull_request: { branches: [master] }
+
+env:
+  VIENNARNA_VERSION: "2.7.0"
+  VIENNARNA_PREFIX: "${{ github.workspace }}/viennarna"
 
 jobs:
   build:
     runs-on: ${{ matrix.os }}
-
     strategy:
-      # Set fail-fast to false to ensure that feedback is delivered for all matrix combinations. Consider changing this to true when your workflow is stable.
       fail-fast: false
-
-      # Set up a matrix to run the following 3 configurations:
-      # 1. <Linux, Release, latest Clang compiler toolchain on the default runner image, default generator>
-      # 2. <macOS, Release, latest Clang compiler toolchain on the default runner image, default generator>
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest, macos-13]
         build_type: [Release]
         include:
-          - os: ubuntu-latest
-            c_compiler: gcc
-            cpp_compiler: g++
-          - os: macos-latest
-            c_compiler: clang
-            cpp_compiler: clang++
-
+          - { os: ubuntu-latest   , c_compiler: gcc  , cpp_compiler: g++      }
+          - { os: ubuntu-24.04-arm, c_compiler: gcc  , cpp_compiler: g++      }
+          - { os: macos-latest    , c_compiler: clang, cpp_compiler: clang++  }
+          - { os: macos-13        , c_compiler: clang, cpp_compiler: clang++  }
     steps:
     - uses: actions/checkout@v4
+      with: { submodules: true }
+
+# -------------------- ViennaRNA --------------------
+    - name: Restore ViennaRNA from cache
+      id: cache-viennarna
+      uses: actions/cache@v4
       with:
-        submodules: true
+        path: ${{ env.VIENNARNA_PREFIX }}
+        key: viennarna-${{ env.VIENNARNA_VERSION }}-${{ runner.os }}-${{ runner.arch }}
 
+    - name: Build & install ViennaRNA
+      if: steps.cache-viennarna.outputs.cache-hit != 'true'
+      run: |
+        curl -L -O https://github.com/ViennaRNA/ViennaRNA/releases/download/v${VIENNARNA_VERSION}/ViennaRNA-${VIENNARNA_VERSION}.tar.gz
+        tar -xzf ViennaRNA-${VIENNARNA_VERSION}.tar.gz
+        cd ViennaRNA-${VIENNARNA_VERSION}
+        ./configure --without-perl --prefix="${VIENNARNA_PREFIX}"
+        CORES=$(nproc 2>/dev/null || sysctl -n hw.ncpu)
+        make -j"$CORES"
+        make install -j"$CORES"
 
-    - name: Set reusable strings
-      # Turn repeated input strings (such as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.
-      id: strings
+    # Expose headers & libs to the compiler / linker / CMake
+    - name: Export ViennaRNA paths
       shell: bash
       run: |
-        echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
-
-
-    - name: Install ViennaRNA
-      run: |
-        curl -L -O https://github.com/ViennaRNA/ViennaRNA/releases/download/v2.7.0/ViennaRNA-2.7.0.tar.gz
-        tar -xzf ViennaRNA-2.7.0.tar.gz
-        cd ViennaRNA-2.7.0
-        ./configure --without-perl
-        CORES=$(nproc || sysctl -n hw.ncpu)
-        sudo make -j$CORES
-        sudo make install -j$CORES
-
+        echo "VIENNARNA_LIB=${VIENNARNA_PREFIX}/lib"                                          >>"$GITHUB_ENV"
+        echo "CPATH=${VIENNARNA_PREFIX}/include:$CPATH"                                       >>"$GITHUB_ENV"
+        echo "LIBRARY_PATH=${VIENNARNA_PREFIX}/lib:$LIBRARY_PATH"                             >>"$GITHUB_ENV"
+        echo "CMAKE_PREFIX_PATH=${VIENNARNA_PREFIX}"                                          >>"$GITHUB_ENV"
+        echo "LD_LIBRARY_PATH=${VIENNARNA_PREFIX}/lib:$LD_LIBRARY_PATH"                       >>"$GITHUB_ENV"
+        echo "DYLD_FALLBACK_LIBRARY_PATH=${VIENNARNA_PREFIX}/lib:$DYLD_FALLBACK_LIBRARY_PATH" >>"$GITHUB_ENV"
+    
+# -------------------- Build --------------------
+    - name: Set reusable strings
+      id: strings
+      run: echo "build-output-dir=${{ github.workspace }}/build" >>"$GITHUB_OUTPUT"
 
     - name: Configure CMake
-      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
-      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
       run: >
         cmake -B ${{ steps.strings.outputs.build-output-dir }}
         -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
@@ -67,10 +70,8 @@ jobs:
         -S ${{ github.workspace }}
 
     - name: Build
-      # Build your program with the given configuration.
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --parallel
 
     - name: Test
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
-      # Execute tests defined by the CMake configuration.
       run: ctest --output-on-failure
