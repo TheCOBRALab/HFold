@@ -1,22 +1,32 @@
+
 >VP_case1
 GGGGGAAAAAAAGGGGGGGGGGAAAAAAAACCCCCAAAAAACCCCCCCCCC
+
 (((((.........................)))))................
 >VP_case2
-GGGGGAAAAAAAGGGGGGGGGGAAAAAAAACCCCCAAAAAACCCCCCCCCC
+
+GGGGGAAAAAAAGGGGGGGGGGAAAAAAAACCCCCAAAAAACCCCCCCCCC 
 ............((((((((((...................))))))))))
+
 >VP_case3
 CCCCCCCCCCAAAAAAGGGGGAAAGGGGGGGGGGAAAAGGGGGGGGGGAAAAAAAACCCCCAAAAAACCCCCCCCCC
+
 ((((((((((..............))))))))))....((((((((((...................))))))))))
 >VP_case1_and_case2
-CCCCCCCCCCAAAAAAGGGGGAAAGGGGGGGGGGAAAAGGGGGGGGGGAAAAAAAACCCCCAAAAAACCCCCCCCCC
-................(((((...................................)))))................   
+
+        CCCCCCCCCCAAAAAAGGGGGAAAGGGGGGGGGGAAAAGGGGGGGGGGAAAAAAAACCCCCAAAAAACCCCCCCCCC
+................(((((...................................)))))................
+             
+
 >Multiloop_with_pseudoknot
 AAAAAAGGGGGAAAAAAAGGGGGGGGGGAAAAAAAACCCCCAAAAAACCCCCCCCCCUUUUUU
 (((((((((((.........................)))))................))))))
 >Multiloop_that_spans_a_band
-GGGGGGAAAAAGGGGGGAAAAGGGGGGCCCCCCAAAAAACCCCCCAAAAGGGGGGAAAAAACCCCCCAAAAAACCCCCC
+
+   GGGGGGAAAAAGGGGGGAAAAGGGGGGCCCCCCAAAAAACCCCCCAAAAGGGGGGAAAAAACCCCCCAAAAAACCCCCC
 ((((((.....................))))))................((((((......))))))............
->Multiloop_that_spans_a_band_with_extra
+>Multiloop_that_spans_a_band_with_extra   
+
 GGGGGGAAAAAGGGGGGAAAAGGGGGGCCCCCCAAAAAACCCCCCAAAAGGGGGGAAAAAACCCCCCAAAGGGAAACCCCCCCCC
 ((((((.....................))))))................((((((......))))))...(((...)))......
 
