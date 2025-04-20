@@ -1,0 +1,28 @@
+>VP_case1
+GGGGGAAAAAAAGGGGGGGGGGAAAAAAAACCCCCAAAAAACCCCCCCCCC
+Restricted: (((((.........................)))))................
+Result:     (((((.......[[[[[[[[[[........)))))......]]]]]]]]]] (-20.16)
+>VP_case2
+GGGGGAAAAAAAGGGGGGGGGGAAAAAAAACCCCCAAAAAACCCCCCCCCC
+Restricted: ............((((((((((...................))))))))))
+Result:     [[[[[.......((((((((((........]]]]]......)))))))))) (-20.16)
+>VP_case3
+CCCCCCCCCCAAAAAAGGGGGAAAGGGGGGGGGGAAAAGGGGGGGGGGAAAAAAAACCCCCAAAAAACCCCCCCCCC
+Restricted: ((((((((((..............))))))))))....((((((((((...................))))))))))
+Result:     ((((((((((......[[[[[...))))))))))....((((((((((........]]]]]......)))))))))) (-34.62)
+>VP_case1_and_case2
+CCCCCCCCCCAAAAAAGGGGGAAAGGGGGGGGGGAAAAGGGGGGGGGGAAAAAAAACCCCCAAAAAACCCCCCCCCC
+Restricted: ................(((((...................................)))))................
+Result:     [[[[[[[[[[......(((((...]]]]]]]]]]....[[[[[[[[[[........)))))......]]]]]]]]]] (-34.62)
+>Multiloop_with_pseudoknot
+AAAAAAGGGGGAAAAAAAGGGGGGGGGGAAAAAAAACCCCCAAAAAACCCCCCCCCCUUUUUU
+Restricted: (((((((((((.........................)))))................))))))
+Result:     (((((((((((.......[[[[[[[[[[........)))))......]]]]]]]]]])))))) (-8.71)
+>Multiloop_that_spans_a_band
+GGGGGGAAAAAGGGGGGAAAAGGGGGGCCCCCCAAAAAACCCCCCAAAAGGGGGGAAAAAACCCCCCAAAAAACCCCCC
+Restricted: ((((((.....................))))))................((((((......))))))............
+Result:     ((((((.....[[[[[[....[[[[[[))))))......]]]]]]....((((((......))))))......]]]]]] (-25.71)
+>Multiloop_that_spans_a_band_with_extra
+GGGGGGAAAAAGGGGGGAAAAGGGGGGCCCCCCAAAAAACCCCCCAAAAGGGGGGAAAAAACCCCCCAAAGGGAAACCCCCCCCC
+Restricted: ((((((.....................))))))................((((((......))))))...(((...)))......
+Result:     ((((((.....[[[[[[....[[[[[[))))))......]]]]]]....((((((......))))))...(((...)))]]]]]] (-26.14)

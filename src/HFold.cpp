@@ -1,4 +1,5 @@
 // Iterative HFold files
+#include "HFold.hpp"
 #include "cmdline.hpp"
 #include "W_final.hpp"
 #include "h_globals.hpp"
@@ -10,19 +11,6 @@
 #include <fstream>
 #include <string>
 #include <filesystem>
-
-struct RNAEntry {
-    std::string name;
-    std::string sequence;
-    std::string structure;
-
-    // Constructor that takes all three fields
-    RNAEntry(std::string n, std::string s, std::string st)
-        : name(std::move(n)), sequence(std::move(s)), structure(std::move(st)) {}
-
-    // Default constructor (needed for vector resizing or default initialization)
-    RNAEntry() = default;
-};
 
 
 std::string getSequence(args_info a) {
@@ -263,8 +251,8 @@ void output_results(
     const std::vector<Result>& results,
     const std::string& fileO,
     int suboptCount,
-    const std::string& name = "",
-    const std::size_t input_count = 1
+    const std::string& name,
+    const std::size_t input_count
 ) {
     int number_of_output = std::min(results.size(), static_cast<std::size_t>(suboptCount));
 
@@ -274,10 +262,16 @@ void output_results(
             out << ">" << name << std::endl; 
         }
         out << seq << std::endl;
-        for (int i = 0; i < number_of_output; i++) {
-            out << "Restricted_" << i << ": " << results[i].get_restricted() << std::endl;
-            out << "Result_" << i << ":     " << results[i].get_final_structure()
-                << " (" << results[i].get_final_energy() << ")" << std::endl;
+        if (number_of_output == 1) {
+            out << "Restricted" << ": " << results[0].get_restricted() << std::endl;
+            out << "Result" << ":     " << results[0].get_final_structure()
+                << " (" << results[0].get_final_energy() << ")" << std::endl;
+        } else {
+            for (int i = 0; i < number_of_output; i++) {
+                out << "Restricted_" << i << ": " << results[i].get_restricted() << std::endl;
+                out << "Result_" << i << ":     " << results[i].get_final_structure()
+                    << " (" << results[i].get_final_energy() << ")" << std::endl;
+            }
         }
     } else { // output to console
         if (!name.empty() && input_count > 1){

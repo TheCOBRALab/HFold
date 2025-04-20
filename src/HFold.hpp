@@ -10,6 +10,13 @@ struct RNAEntry {
     std::string name;
     std::string sequence;
     std::string structure;
+
+    // Constructor that takes all three fields
+    RNAEntry(std::string n, std::string s, std::string st)
+        : name(std::move(n)), sequence(std::move(s)), structure(std::move(st)) {}
+
+    // Default constructor (needed for vector resizing or default initialization)
+    RNAEntry() = default;
 };
 
 std::string getSequence(args_info a);
