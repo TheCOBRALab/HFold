@@ -16,30 +16,42 @@ namespace py = pybind11;
 ───────────────────────────────────────────────────────────*/
 namespace bindings
 {
-    std::vector<std::vector<Result>> hfold_simple(
+    std::vector<std::vector<py::dict>> hfold_simple(
         std::string sequence = "",
         std::string restricted = "",
-        double energy = 0.0,
         bool pk_free = false,
         bool pk_only = false,
         int dangles = 2,
         int suboptCount = 1,
         std::string fileI = "",
         std::string fileO = "",
-        std::string paramFile = "",
-        bool noConv_given = false
+        std::string param_file = "",
+        bool noConv_given = false,
+        bool suppress_output = false
     ) {
         bool input_structure_given = !restricted.empty();
         std::vector<RNAEntry> inputs = get_all_inputs(fileI, sequence, restricted);
-        std::vector<std::vector<Result>> all_results;
+        std::vector<std::vector<py::dict>> all_results;
 
         for (RNAEntry& current: inputs) {
             preprocess_sequence(current.sequence, current.structure, noConv_given);
-            load_energy_parameters(paramFile, current.sequence);
+            load_energy_parameters(param_file, current.sequence);
             std::vector<Hotspot> hotspots = build_hotspots(current.sequence, current.structure, suboptCount);
             std::vector<Result> results = fold_hotspots(current.sequence, hotspots, pk_free, pk_only, dangles, input_structure_given);
-            output_results(current.sequence, results, fileO, suboptCount, current.name, inputs.size());
-            all_results.push_back(results);
+            output_results(current.sequence, results, fileO, suboptCount, current.name, inputs.size(), suppress_output);
+
+            std::vector<py::dict> result_dicts;
+            for (const Result& r : results) {
+                py::dict d;
+                d["sequence"] = r.get_sequence();
+                d["restricted"] = r.get_restricted();
+                d["restricted_energy"] = r.get_restricted_energy();
+                d["final_structure"] = r.get_final_structure();
+                d["final_energy"] = r.get_final_energy();
+                result_dicts.push_back(d);
+            }
+
+            all_results.push_back(result_dicts);
         }
 
         return all_results;
@@ -75,32 +87,32 @@ PYBIND11_MODULE(hfold, m)
         "hfold",
         &bindings::hfold_simple,
         py::arg("sequence") = "",
-        py::arg("structure") = "",
-        py::arg("energy") = 0.0,
+        py::arg("restriction") = "",
         py::arg("pk_free") = false,
         py::arg("pk_only") = false,
         py::arg("dangles") = 2,
-        py::arg("suboptCount") = 1,
+        py::arg("subopt") = 1,
         py::arg("fileI") = "",
         py::arg("fileO") = "",
-        py::arg("paramFile") = "",
+        py::arg("param_file") = "",
         py::arg("noConv_given") = false,
+        py::arg("suppress_output") = false,
         R"pbdoc(
               Fold an RNA/DNA sequence.
 
               Parameters
               ----------
               sequence : str, optional
-              structure : str, optional
-              energy : float, optional
+              restriction : str, optional
               pk_free : bool, optional
               pk_only : bool, optional
               dangles : int, optional
-              suboptCount : int, optional
+              subopt : int, optional
               fileI : str, optional
               fileO : str, optional
-              paramFile : str, optional
+              param_file : str, optional
               noConv_given : bool, optional
+              suppress_output : bool, optional
 
               Returns
               -------

@@ -101,7 +101,7 @@ setup(
     long_description_content_type="text/markdown",
     packages=find_packages(exclude=["tests", "docs"]),
     ext_modules=ext_modules,
-    install_requires=[],
+    install_requires=["pybind11>=2.10"],
     python_requires=">=3.6",
     classifiers=[
         "Programming Language :: Python :: 3",
