@@ -26,7 +26,6 @@ int main(int argc, char* argv[]) {
     std::string paramFile  = a.paramFile_given       ? parameter_file : "params/rna_DirksPierce09.par";
 
     std::vector<RNAEntry> inputs = get_all_inputs(fileI, sequence, restricted);
-    // handle_output_file(fileO);
 
     for (RNAEntry& current : inputs){
         preprocess_sequence(current.sequence, current.structure, a.noConv_given);
