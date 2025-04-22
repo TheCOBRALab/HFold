@@ -1,98 +1,50 @@
 // hfold_bindings.cpp
-//  python3 setup.py build_ext --inplace
 
 #include <pybind11/pybind11.h>
-#include <pybind11/stl.h>            // std::pair ⇆ Python tuple
-#include <HFold.hpp>
-#include <sparse_tree.hpp>
-#include <W_final.hpp>
+#include <pybind11/stl.h>
 #include <filesystem>
+
+#include <HFold.hpp>
+#include <Result.hpp>
+#include <W_final.hpp>
 
 namespace py = pybind11;
 
 
 /*───────────────────────────────────────────────────────────
-  Internal helpers for Python bindings (Functions that are not exposed to Python)
-───────────────────────────────────────────────────────────*/
-namespace bindings::helpers
-{
-    vrna_param_s* load_parameters(std::string param_file){
-        if (std::filesystem::exists(param_file)) {
-            vrna_params_load(param_file.c_str(), VRNA_PARAMETER_FORMAT_DEFAULT);
-        } else {
-            throw std::runtime_error("Parameter file not found: " + param_file);
-        }
-    
-        // Scale parameters (matches main behavior)
-        vrna_param_s* params = scale_parameters();
-        return params;
-    }
-}
-
-
-/*-───────────────────────────────────────────────────────────
-Python Bindings (Functions that are exposed to Python)
+  Python Bindings (Functions that are exposed to Python)
 ───────────────────────────────────────────────────────────*/
 namespace bindings
-{   
-    std::pair<std::string, double>
-    hfold_simple(std::string sequence,
-                 std::string constraint = "",
-                 const std::string &param_file = "")
-    {   
-        /** 
-        * @brief Predict a single RNA secondary structure using HFold with optional constraints.
-        * 
-        * This is a simplified wrapper around the HFold core algorithm, designed for use from Python.
-        * It takes an RNA or DNA sequence, optionally applies a structure constraint (in dot-bracket notation),
-        * and returns the predicted minimum-free-energy structure and its associated energy.
-        * 
-        * @param sequence The nucleotide sequence to fold. Can include A, C, G, U (or T, which will be converted to U).
-        * @param constraint Optional dot-bracket structure constraint. Must be the same length as the sequence. 
-        *                   If omitted, all positions are considered unpaired.
-        * @param param_file Optional path to a ViennaRNA parameter file.
-        */
-        validateSequence(sequence);
-        seqtoRNA(sequence);
-        
-        if (!constraint.empty()) {
-            validateStructure(sequence, constraint);
-        } else {
-            // If the user gave no restriction, make an all‑dots string
-            constraint = std::string(sequence.length(), '.');
+{
+    std::vector<std::vector<Result>> hfold_simple(
+        std::string sequence = "",
+        std::string restricted = "",
+        double energy = 0.0,
+        bool pk_free = false,
+        bool pk_only = false,
+        int dangles = 2,
+        int suboptCount = 1,
+        std::string fileI = "",
+        std::string fileO = "",
+        std::string paramFile = "",
+        bool noConv_given = false
+    ) {
+        bool input_structure_given = !restricted.empty();
+        std::vector<RNAEntry> inputs = get_all_inputs(fileI, sequence, restricted);
+        std::vector<std::vector<Result>> all_results;
+
+        for (RNAEntry& current: inputs) {
+            preprocess_sequence(current.sequence, current.structure, noConv_given);
+            load_energy_parameters(paramFile, current.sequence);
+            std::vector<Hotspot> hotspots = build_hotspots(current.sequence, current.structure, suboptCount);
+            std::vector<Result> results = fold_hotspots(current.sequence, hotspots, pk_free, pk_only, dangles, input_structure_given);
+            output_results(current.sequence, results, fileO, suboptCount, current.name, inputs.size());
+            all_results.push_back(results);
         }
 
-        if (!param_file.empty()) {
-            helpers::load_parameters(param_file);
-        }
-
-        // get size of the sequence to allocate the sparse tree
-        const int n = static_cast<int>(sequence.size());
-        sparse_tree tree(constraint, n);
-
-        double energy = 0.0;
-        bool pk_free = false;
-        bool pk_only = false;
-        int dangles = 2;
-
-        std::string final_structure =
-            hfold(sequence,
-                  constraint,
-                  energy,
-                  tree,
-                  pk_free,
-                  pk_only,
-                  dangles);
-        
-        // If it takes energy to fold, it's best to not fold
-        if (energy > 0.0) {
-            energy = 0.0;
-            constraint = std::string(sequence.length(), '.');
-        }
-
-        return {final_structure, energy};
+        return all_results;
     }
-} 
+}
 
 
 /*───────────────────────────────────────────────────────────
@@ -101,26 +53,57 @@ namespace bindings
 PYBIND11_MODULE(hfold, m)
 {
     m.doc() = "HFold minimal Python bindings";
-    m.def("hfold",
-          &bindings::hfold_simple,
-          py::arg("sequence"),
-          py::arg("structure") = "",
-          py::arg("param_file") = "",
-          R"pbdoc(
+
+    // Result class
+    py::class_<Result>(m, "Result")
+        .def(py::init<std::string, std::string, double, std::string, double>())
+        .def("get_sequence", &Result::get_sequence)
+        .def("get_restricted", &Result::get_restricted)
+        .def("get_final_structure", &Result::get_final_structure)
+        .def("get_restricted_energy", &Result::get_restricted_energy)
+        .def("get_final_energy", &Result::get_final_energy)
+        .def("__repr__", [](const Result& r) {
+            return "<Result sequence='" + r.get_sequence() +
+                   "', restricted='" + r.get_restricted() +
+                   "', restricted_energy=" + std::to_string(r.get_restricted_energy()) +
+                   ", final_structure='" + r.get_final_structure() +
+                   "', final_energy=" + std::to_string(r.get_final_energy()) + ">";
+        });
+
+    // hfold function
+    m.def(
+        "hfold",
+        &bindings::hfold_simple,
+        py::arg("sequence") = "",
+        py::arg("structure") = "",
+        py::arg("energy") = 0.0,
+        py::arg("pk_free") = false,
+        py::arg("pk_only") = false,
+        py::arg("dangles") = 2,
+        py::arg("suboptCount") = 1,
+        py::arg("fileI") = "",
+        py::arg("fileO") = "",
+        py::arg("paramFile") = "",
+        py::arg("noConv_given") = false,
+        R"pbdoc(
               Fold an RNA/DNA sequence.
 
               Parameters
               ----------
-              sequence : str
-                  Nucleotide sequence (A,C,G,U/T).
+              sequence : str, optional
               structure : str, optional
-                  Dot-bracket restriction; must match sequence length.
-              param_file : str, optional
-                  Path to parameter file
+              energy : float, optional
+              pk_free : bool, optional
+              pk_only : bool, optional
+              dangles : int, optional
+              suboptCount : int, optional
+              fileI : str, optional
+              fileO : str, optional
+              paramFile : str, optional
+              noConv_given : bool, optional
 
               Returns
               -------
-              tuple(str, float)
-                  (final_structure, minimum_free_energy)
-          )pbdoc");
+              list[list[Result]]
+        )pbdoc");
 }

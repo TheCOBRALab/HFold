@@ -1,7 +1,7 @@
 name: CMake on multiple platforms
 
 on:
-  push:         { branches: [master, python] }
+  push:         { branches: [master] }
   pull_request: { branches: [master] }
 
 env:

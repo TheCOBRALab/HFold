@@ -40,6 +40,10 @@ bash.sh
 
 # virtual environment
 venv/
+.venv/
+
+# Python build
+/pylib/build/
 
 # Makefiles and tests
 /CMakeFiles/

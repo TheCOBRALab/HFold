@@ -9,10 +9,11 @@ import codecs
 VERSION = "1.0.0"
 DESCRIPTION = "HFold: A Python wrapper for the HFold C++ library"
 
-here = os.path.abspath(os.path.dirname(__file__))
-home = os.path.abspath(os.path.join(here, "../"))
-src_dir = os.path.join(home, "src")
-bindings_dir = os.path.join(home, "bindings")
+here         = os.path.abspath(os.path.dirname(__file__))
+project_root = os.path.abspath(os.path.join(here, ".."))
+src_dir      = os.path.join(project_root, "src")
+bindings_dir = os.path.join(here, "bindings")
+
 
 # Read the contents of your README file to use as the long description
 with codecs.open(os.path.join(here, "../README.md"), encoding="utf-8") as fh:
@@ -100,10 +101,7 @@ setup(
     long_description_content_type="text/markdown",
     packages=find_packages(exclude=["tests", "docs"]),
     ext_modules=ext_modules,
-    install_requires=[
-        "numpy",
-        "pandas",
-    ],
+    install_requires=[],
     python_requires=">=3.6",
     classifiers=[
         "Programming Language :: Python :: 3",

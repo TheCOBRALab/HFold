@@ -7,7 +7,6 @@
 #include <functional>
 
 #include <HFold.hpp>
-#include <sparse_tree.hpp>
 #include <W_final.hpp>
 #include "helper.hpp"
 
