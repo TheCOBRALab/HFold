@@ -61,12 +61,31 @@ std::vector<std::vector<Result>> hfold_test(HFoldParams& p) {
 
     std::vector<RNAEntry> inputs = get_all_inputs(p.fileI, p.sequence, p.restricted);
     std::vector<std::vector<Result>> all_results;
-    for (RNAEntry current : inputs){
+    for (RNAEntry& current : inputs){
         preprocess_sequence(current.sequence, current.structure, p.noConv_given);
         load_energy_parameters(p.paramFile, current.sequence);
-        std::vector<Hotspot> hotspots = build_hotspots(current.sequence, current.structure, p.suboptCount);
-        std::vector<Result>  results  = fold_hotspots(current.sequence, hotspots, p.pk_free, p.pk_only, p.dangles, input_structure_given);
-        output_results(current.sequence, results, p.fileO, p.suboptCount, current.name, inputs.size());
+
+        std::vector<Hotspot> hotspots = build_hotspots(
+            current.sequence,
+            current.structure,
+            p.suboptCount
+        );
+
+        std::vector<Result>  results  = fold_hotspots(
+            current.sequence,
+            hotspots, p.pk_free,
+            p.pk_only, p.dangles,
+            input_structure_given
+        );
+
+        output_results(
+            current.sequence,
+            results, p.fileO,
+            p.suboptCount,
+            current.name,
+            inputs.size()
+        );
+
         all_results.push_back(results);
     }
     return all_results;

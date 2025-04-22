@@ -28,12 +28,30 @@ int main(int argc, char* argv[]) {
     std::vector<RNAEntry> inputs = get_all_inputs(fileI, sequence, restricted);
     // handle_output_file(fileO);
 
-    for (RNAEntry current : inputs){
+    for (RNAEntry& current : inputs){
         preprocess_sequence(current.sequence, current.structure, a.noConv_given);
         load_energy_parameters(paramFile, current.sequence);
-        std::vector<Hotspot> hotspots = build_hotspots(current.sequence, current.structure, suboptCount);
-        std::vector<Result>  results  = fold_hotspots(current.sequence, hotspots, pk_free, pk_only, dangles, a.input_structure_given);
-        output_results(current.sequence, results, fileO, suboptCount, current.name, inputs.size());
+
+        std::vector<Hotspot> hotspots = build_hotspots(
+            current.sequence,
+            current.structure,
+            suboptCount
+        );
+
+        std::vector<Result>  results  = fold_hotspots(
+            current.sequence,
+            hotspots, pk_free,
+            pk_only, dangles,
+            a.input_structure_given
+        );
+
+        output_results(current.sequence, 
+            results,
+            fileO,
+            suboptCount,
+            current.name,
+            inputs.size()
+        );
     }
 
     cmdline_parser_free(&a);

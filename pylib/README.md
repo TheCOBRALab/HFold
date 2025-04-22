@@ -1,0 +1,1 @@
+To build locally, go to the pylib dir and run `python3 setup.py build_ext --inplace`

@@ -197,6 +197,8 @@ void preprocess_sequence(std::string& seq, std::string& restricted, bool noConv)
 }
 
 void load_energy_parameters(const std::string& paramFile, const std::string& seq) {
+    if (paramFile.empty()) return; // No parameter file provided
+    
     if (std::filesystem::exists(paramFile)) {
         vrna_params_load(paramFile.c_str(), VRNA_PARAMETER_FORMAT_DEFAULT);
     } else if (seq.find('T') != std::string::npos) { // if T is present, load DNA parameters

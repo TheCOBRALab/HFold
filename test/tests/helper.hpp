@@ -6,7 +6,6 @@ struct HFoldParams {
     std::string sequence = "";
     std::string restricted = "";
     double energy = 0.0;
-    sparse_tree* tree = nullptr;
     bool pk_free = false;
     bool pk_only = false;
     int dangles = 2;
