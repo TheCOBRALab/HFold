@@ -154,41 +154,6 @@ void seqtoRNA(std::string &sequence){
 	}
 }
 
-void handle_output_file(std::string& fileO) {
-    /**
-     * @brief Handles the output file path.
-     * 
-     * This function checks if the output file already exists and prompts the user
-     * for confirmation to overwrite it. If the user chooses to cancel, the program exits.
-     * If the user provides an empty string, it will keep prompting until a valid path is given.
-     * 
-     * @param fileO The output file path to be checked and possibly modified.
-     * @return void
-     * 
-     * @deprecated (Keeping this function in case we decide to overwrite the output file instead of append)
-     */
-
-    if (fileO.empty()) return; // User didn't provide an output file
-    
-    while (fileO.empty() || std::filesystem::exists(fileO)){
-        if (fileO.empty()){
-            std::cout << "Enter output file path (or 'c' to cancel): ";
-            std::getline(std::cin, fileO);
-            if (fileO == "c" or fileO == "C") std::exit(0);
-        } else {
-            std::cout << "Output file already exists. Overwrite? (y/n/c): ";
-            char choice;
-            std::cin >> choice;
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // clear the input buffer
-            choice = std::tolower(choice);
-            
-            if (choice == 'y') return;
-            if (choice == 'c') std::exit(0);
-            if (choice == 'n') fileO.clear();
-        }
-    }
-}
-
 void preprocess_sequence(std::string& seq, std::string& restricted, bool noConv) {
     std::transform(seq.begin(), seq.end(), seq.begin(), ::toupper); // convert sequence to uppercase
     if (!noConv) seqtoRNA(seq);
