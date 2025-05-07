@@ -1,5 +1,10 @@
-To run a test locally, first build the project
+To run a test locally, first you need to ensure you imported submodules
 
+```bash
+git submodule update --init --recursive
+```
+
+Then build the project
 ```bash
 cmake -S . -B build
 cmake --build build --parallel
