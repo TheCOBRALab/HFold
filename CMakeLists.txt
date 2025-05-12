@@ -38,12 +38,25 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
 endif()
 
+# Get Raw user input for library path
+set(_raw_user_input_lib "${VIENNARNA_LIB}") # user input using -D flag
+if (NOT _raw_user_input_lib)
+    set(_raw_user_input_lib "$ENV{VIENNARNA_LIB}") # user input using environment variable
+endif()
+
+# Set path to the cache variable VIENNARNA_LIB
+if(_raw_user_input_lib)
+    set(VIENNARNA_LIB
+        "${_raw_user_input_lib}"
+        CACHE PATH "Path to ViennaRNA headers" FORCE)
+endif()
+
 # Locate ViennaRNA library
 find_library(VIENNARNA_LIBRARY
     NAMES vrna RNA
     PATHS
-        $ENV{VIENNARNA_LIB}
-        /usr/local/lib
+        ${VIENNARNA_LIB}
+        /usr/local/lib/
         /usr/lib
         /opt/homebrew/lib
         /opt/vienna/lib
@@ -52,13 +65,66 @@ find_library(VIENNARNA_LIBRARY
     DOC "Path to ViennaRNA library"
 )
 
-message(STATUS "VIENNARNA_LIBRARY = ${VIENNARNA_LIBRARY}")
-
-if(VIENNARNA_LIBRARY)
-    message(STATUS "Found system ViennaRNA library at: ${VIENNARNA_LIBRARY}")
-else()
-    message(FATAL_ERROR "ViennaRNA library not found. Please install ViennaRNA and try again.")
+# ---------------- Clean include DIR path ----------------
+# Get user input for include directory
+set(_raw_user_input_dir "${VIENNARNA_INCLUDE_DIR}") # user input using -D flag
+if (NOT _raw_user_input_dir)
+    set(_raw_user_input_dir "$ENV{VIENNARNA_INCLUDE_DIR}") # user input using environment variable
 endif()
+
+set(_clean_user_input_dir "${_raw_user_input_dir}")
+
+if(_clean_user_input_dir MATCHES "(.*/ViennaRNA)/pair_mat.h$")
+    get_filename_component(_clean_user_input_dir "${_clean_user_input_dir}" DIRECTORY)  # strip pair_mat.h
+    get_filename_component(_clean_user_input_dir "${_clean_user_input_dir}" DIRECTORY)  # strip ViennaRNA
+elseif(_clean_user_input_dir MATCHES ".*/ViennaRNA/?$")
+    get_filename_component(_clean_user_input_dir "${_clean_user_input_dir}" DIRECTORY) # strip ViennaRNA
+endif()
+
+# Set the cleaned path to the cache variable VIENNARNA_INCLUDE_DIR
+if(_clean_user_input_dir)
+    set(VIENNARNA_INCLUDE_DIR
+        "${_clean_user_input_dir}"
+        CACHE PATH "Path to ViennaRNA headers" FORCE)
+endif()
+
+# Search for the pair_mat.h file
+find_path(VIENNARNA_INCLUDE_DIRECTORY
+          NAMES  ViennaRNA/pair_mat.h
+          HINTS "${VIENNARNA_INCLUDE_DIR}" # first try the cleaned path
+          PATHS
+                /usr/local/include
+                /usr/include
+                /opt/homebrew/include
+                /opt/vienna/include
+          DOC   "Path to ViennaRNA headers")
+
+message(STATUS "VIENNARNA_LIBRARY = ${VIENNARNA_LIBRARY}")
+message(STATUS "VIENNARNA_INCLUDE_DIR = ${VIENNARNA_INCLUDE_DIR}")
+
+
+
+if(NOT VIENNARNA_LIBRARY OR NOT VIENNARNA_INCLUDE_DIRECTORY)
+    message(FATAL_ERROR "
+ViennaRNA library or headers not found. Please install ViennaRNA and try again.
+
+If you already installed ViennaRNA but CMake cannot find it, you can set the following environment variables:
+    export VIENNARNA_LIB=/path/to/vienna/lib/libRNA.a
+    export VIENNARNA_INCLUDE_DIR=/path/to/vienna/include
+
+Alternatively, you can specify the paths directly in the CMake command:
+    cmake -S . -B build -DVIENNARNA_LIB=/path/to/vienna/lib/libRNA.a -DVIENNARNA_INCLUDE_DIR=/path/to/vienna/include
+
+To help locate the necessary files, you can run:
+
+    find /usr/local -name libRNA.a
+    find /usr/local -name pair_mat.h
+
+Make sure the library path contains 'libRNA.a' or 'libvrna.a',
+and the include path contains 'ViennaRNA/pair_mat.h'.
+")
+endif()
+
 
 # Core library sources (excluding main.cpp)
 set(hfold_sources
@@ -80,11 +146,13 @@ set(COMMON_COMPILE_OPTIONS
 
 # Build the core logic as a library (Useful for testing)
 add_library(HFoldLib ${hfold_sources})
+target_include_directories(HFoldLib PRIVATE ${VIENNARNA_INCLUDE_DIRECTORY})
 target_link_libraries(HFoldLib PUBLIC ${VIENNARNA_LIBRARY})
 target_compile_options(HFoldLib PRIVATE ${COMMON_COMPILE_OPTIONS})
 
 # Build the main executable
 add_executable(HFold src/main.cpp)
+target_include_directories(HFold PRIVATE ${VIENNARNA_INCLUDE_DIRECTORY}) 
 target_link_libraries(HFold PRIVATE HFoldLib)
 target_compile_options(HFold PRIVATE ${COMMON_COMPILE_OPTIONS})
 
