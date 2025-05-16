@@ -72,6 +72,15 @@ jobs:
     - name: Build
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --parallel
 
-    - name: Test
+    - name: Test HFold
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
       run: ctest --output-on-failure
+    
+    - name: Compile Python bindings
+      run: |
+        cd ${{ github.workspace }}/pylib
+        python3 -m venv venv
+        source venv/bin/activate
+        python3 -m pip install pybind11 setuptools
+        python3 setup.py build_ext --inplace
+        python3 -c "import hfold; print('hfold import successful'); hfold.hfold(\"AGGGCUAUCCUU\", suppress_output=True); print('hfold function call successful')"

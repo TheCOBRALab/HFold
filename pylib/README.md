@@ -18,26 +18,32 @@ sudo make install
 ```
 More info: [ViennaRNA GitHub](https://github.com/ViennaRNA/ViennaRNA) 
 
-
-## 2. Install Python Dependencies
-Make sure you have pybind11 and setuptools installed
+## 2. Setup a Virtual Environment
+Make sure you're in a virtual environment
 ```bash
-pip install pybind11 setuptools
+python3 -m venv venv
+source venv/bin/activate
 ```
 
-## 3. Build the Python Extension
+## 3. Install Python Dependencies
+Make sure you have pybind11 and setuptools installed
+```bash
+python3 -m pip install pybind11 setuptools
+```
+
+## 4. Build the Python Extension
 From the project root:
 ```bash
 cd ./pylib
 python3 setup.py build_ext --inplace
 ```
 
-## 4. Start Python (From the `pylib` Directory)
+## 5. Start Python (From the `pylib` Directory)
 ```bash
 python3
 ```
 
-## 5. Run Test Commands
+## 6. Run Test Commands
 Once in the Python shell, you can test `hfold`:
 ```python
 import hfold

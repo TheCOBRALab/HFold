@@ -61,6 +61,11 @@ if not vienna_lib:
         # If ViennaRNA is not found in common locations, raise an error
         raise RuntimeError("Please set VIENNARNA_LIB environment variables")
 
+# Compiler flags
+extra_compile_args=["-O3", "-std=c++17", "-DHAVE_STRDUP=1"]
+if sys.platform == "darwin": # macOS
+    extra_compile_args += ["-mmacosx-version-min=10.15"]
+
 ext_modules = [
     Extension(
         "hfold",
@@ -74,7 +79,7 @@ ext_modules = [
         ],
         library_dirs=[vienna_lib],
         libraries=["RNA"],
-        extra_compile_args=["-O3", "-std=c++17", "-DHAVE_STRDUP=1"],
+        extra_compile_args=extra_compile_args,
 
     )
 ]
