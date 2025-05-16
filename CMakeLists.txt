@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.10)
 project(HFold
     LANGUAGES C CXX
     DESCRIPTION "RNA folding prediction tool"
@@ -54,8 +54,8 @@ endif()
 # Locate ViennaRNA library
 find_library(VIENNARNA_LIBRARY
     NAMES vrna RNA
+    HINTS ${VIENNARNA_LIB}
     PATHS
-        ${VIENNARNA_LIB}
         /usr/local/lib/
         /usr/lib
         /opt/homebrew/lib
@@ -100,29 +100,30 @@ find_path(VIENNARNA_INCLUDE_DIRECTORY
           DOC   "Path to ViennaRNA headers")
 
 message(STATUS "VIENNARNA_LIBRARY = ${VIENNARNA_LIBRARY}")
-message(STATUS "VIENNARNA_INCLUDE_DIR = ${VIENNARNA_INCLUDE_DIR}")
+message(STATUS "VIENNARNA_INCLUDE_DIRECTORY = ${VIENNARNA_INCLUDE_DIRECTORY}")
 
 
 
 if(NOT VIENNARNA_LIBRARY OR NOT VIENNARNA_INCLUDE_DIRECTORY)
-    message(FATAL_ERROR "
-ViennaRNA library or headers not found. Please install ViennaRNA and try again.
+message(FATAL_ERROR "
+❌ ViennaRNA library not found!
 
-If you already installed ViennaRNA but CMake cannot find it, you can set the following environment variables:
-    export VIENNARNA_LIB=/path/to/vienna/lib/libRNA.a
-    export VIENNARNA_INCLUDE_DIR=/path/to/vienna/include
+To fix this, either:
 
-Alternatively, you can specify the paths directly in the CMake command:
-    cmake -S . -B build -DVIENNARNA_LIB=/path/to/vienna/lib/libRNA.a -DVIENNARNA_INCLUDE_DIR=/path/to/vienna/include
+1. Set environment variables:
+   export VIENNARNA_LIB=/path/to/libRNA.a
+   export VIENNARNA_INCLUDE_DIR=/path/to/include
 
-To help locate the necessary files, you can run:
+2. Or pass them to CMake directly:
+   cmake -S . -B build \\
+     -DVIENNARNA_LIB=/path/to/libRNA.a \\
+     -DVIENNARNA_INCLUDE_DIR=/path/to/include
 
-    find /usr/local -name libRNA.a
-    find /usr/local -name pair_mat.h
-
-Make sure the library path contains 'libRNA.a' or 'libvrna.a',
-and the include path contains 'ViennaRNA/pair_mat.h'.
+Tip: To find the files, try:
+   find /usr/local /home -name libRNA.a
+   find /usr/local /home -name pair_mat.h
 ")
+
 endif()
 
 
@@ -152,6 +153,7 @@ target_compile_options(HFoldLib PRIVATE ${COMMON_COMPILE_OPTIONS})
 
 # Build the main executable
 add_executable(HFold src/main.cpp)
+target_sources(HFold PRIVATE src/cmdline.cpp src/HFold.cpp) # Re-add for Conda packaging (doesn't work without this for some reason)
 target_include_directories(HFold PRIVATE ${VIENNARNA_INCLUDE_DIRECTORY}) 
 target_link_libraries(HFold PRIVATE HFoldLib)
 target_compile_options(HFold PRIVATE ${COMMON_COMPILE_OPTIONS})

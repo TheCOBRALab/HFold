@@ -1,11 +1,17 @@
 package:
   name: hfold
-  version: "1.0.0"
+  version: "1.0.1"
 
 source:
   path: ..
   # git_url: https://github.com/HosnaJabbari/HFold.git
   # git_rev: (latest tag)
+
+build:
+  script_env:
+    - VIENNARNA_LIB
+    - VIENNARNA_INCLUDE_DIR
+    - VIENNARNA_PREFIX
 
 requirements:
   build:
@@ -14,11 +20,11 @@ requirements:
     - make
     - cmake >=3.1
   host:
-    - libstdcxx-ng    # [linux]
-    - libcxx          # [osx]
+    - libstdcxx-ng # [linux]
+    - libcxx       # [osx]
   run:
-    - libstdcxx-ng    # [linux]
-    - libcxx          # [osx]
+    - libstdcxx-ng # [linux]
+    - libcxx       # [osx]
 
 about:
   home: https://github.com/HosnaJabbari/HFold
