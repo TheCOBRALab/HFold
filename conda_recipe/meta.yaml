@@ -11,14 +11,10 @@ requirements:
     - {{ compiler('cxx') }}
     - make
     - cmake >=3.1
-    - python>=3.8
   host:
-    - viennarna
     - libstdcxx-ng # [linux]
     - libcxx       # [osx]
   run:
-    - viennarna
-    - python>=3.8
     - libstdcxx-ng # [linux]
     - libcxx       # [osx]
 

@@ -26,9 +26,8 @@ jobs:
       with:
         auto-update-conda: true
         auto-activate-base: false
-        python-version: "3.9"
         miniconda-version: latest
-        channels: bioconda, conda-forge, defaults
+        channels: conda-forge, defaults
         channel-priority: strict
         architecture: ${{ runner.arch == 'ARM64' && 'arm64' || 'x64' }}
 
@@ -38,14 +37,16 @@ jobs:
           arch=$(uname -m)
           if [[ "$arch" == "arm64" ]]; then
             echo "Detected macOS ARM64"
-            conda install -y python=3.9 conda-build anaconda-client clang_osx-arm64 clangxx_osx-arm64
+            conda install -y conda-build anaconda-client clang_osx-arm64 clangxx_osx-arm64
           else
             echo "Detected macOS Intel"
-            conda install -y python=3.9 conda-build anaconda-client clang_osx-64 clangxx_osx-64
+            conda install -y conda-build anaconda-client clang_osx-64 clangxx_osx-64
           fi
         else
           echo "Detected Linux"
-          conda install -y python=3.9 conda-build anaconda-client 
+          sudo apt-get update
+          sudo apt-get install -y libmpfr-dev libgsl-dev
+          conda install -y conda-build anaconda-client 
         fi
 
 # -------------------- Build --------------------
@@ -53,9 +54,10 @@ jobs:
       env:
         CONDA_BLD_PATH: /tmp/bld
       run: |
+        export CONDA_BLD_PATH=/tmp/conda-build
         mkdir -p "$CONDA_BLD_PATH"
-        conda build ./conda_recipe \
-        --croot /tmp/bld 
+        conda build ./conda_recipe --croot "$CONDA_BLD_PATH" \
+        --croot /tmp/bld
 
     - name: Upload Package to Anaconda
       if: success()
@@ -75,6 +77,9 @@ jobs:
 
     - name: Install just-uploaded HFold
       run: |
+        conda init
+        conda activate base
+        conda config --add channels conda-forge
         conda install --yes cobralab::hfold=${HFOLD_VERSION} --no-channel-priority --override-channels -c cobralab
         HFold --version
   
