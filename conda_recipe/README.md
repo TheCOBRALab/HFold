@@ -5,6 +5,8 @@
 
 ## How to build the package
 - Start in the HFold folder
+- Run `conda config --add channels bioconda` to add ViennaRNA
+- Run `conda config --add channels conda-forge` to add support for viennarna 2.7
 - Run `conda build ./conda_recipe` to build package
 - Run `conda install --use-local hfold` to install (case sensitive)
 - Run `HFold --help` to insure it installed properly (case sensitive)

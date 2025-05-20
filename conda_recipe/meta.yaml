@@ -3,26 +3,22 @@ package:
   version: "1.0.1"
 
 source:
-  path: ..
-  # git_url: https://github.com/HosnaJabbari/HFold.git
-  # git_rev: (latest tag)
-
-build:
-  script_env:
-    - VIENNARNA_LIB
-    - VIENNARNA_INCLUDE_DIR
-    - VIENNARNA_PREFIX
-
+  - path: ..
+  
 requirements:
   build:
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
     - make
     - cmake >=3.1
+    - python>=3.8
   host:
+    - viennarna
     - libstdcxx-ng # [linux]
     - libcxx       # [osx]
   run:
+    - viennarna
+    - python>=3.8
     - libstdcxx-ng # [linux]
     - libcxx       # [osx]
 

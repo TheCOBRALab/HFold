@@ -4,10 +4,6 @@ on:
   workflow_dispatch:
   release: { types: [published] }
 
-env:
-  VIENNARNA_VERSION: "2.7.0"
-  VIENNARNA_PREFIX: "${{ github.workspace }}/viennarna"
-
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -30,8 +26,9 @@ jobs:
       with:
         auto-update-conda: true
         auto-activate-base: false
+        python-version: "3.9"
         miniconda-version: latest
-        channels: conda-forge, defaults
+        channels: bioconda, conda-forge, defaults
         channel-priority: strict
         architecture: ${{ runner.arch == 'ARM64' && 'arm64' || 'x64' }}
 
@@ -41,60 +38,15 @@ jobs:
           arch=$(uname -m)
           if [[ "$arch" == "arm64" ]]; then
             echo "Detected macOS ARM64"
-            conda install -y conda-build anaconda-client clang_osx-arm64 clangxx_osx-arm64
+            conda install -y python=3.9 conda-build anaconda-client clang_osx-arm64 clangxx_osx-arm64
           else
             echo "Detected macOS Intel"
-            conda install -y conda-build anaconda-client clang_osx-64 clangxx_osx-64
+            conda install -y python=3.9 conda-build anaconda-client clang_osx-64 clangxx_osx-64
           fi
         else
           echo "Detected Linux"
-          conda install -y conda-build anaconda-client
+          conda install -y python=3.9 conda-build anaconda-client 
         fi
-
-
-        
-# -------------------- ViennaRNA --------------------
-    - name: Restore ViennaRNA from cache
-      id: cache-viennarna
-      uses: actions/cache@v4
-      with:
-        path: ${{ env.VIENNARNA_PREFIX }}
-        key: viennarna-${{ env.VIENNARNA_VERSION }}-${{ runner.os }}-${{ runner.arch }}-Conda
-
-    - name: Build & install ViennaRNA
-      if: steps.cache-viennarna.outputs.cache-hit != 'true'
-      run: |
-        if [[ "$RUNNER_OS" == "Linux" ]]; then
-          export CC=$(which x86_64-conda-linux-gnu-cc)
-          export CXX=$(which x86_64-conda-linux-gnu-c++)
-        elif [[ "$RUNNER_OS" == "macOS" ]]; then
-          export CC=$(which clang)
-          export CXX=$(which clang++)
-        fi
-        curl -L -O https://github.com/ViennaRNA/ViennaRNA/releases/download/v${VIENNARNA_VERSION}/ViennaRNA-${VIENNARNA_VERSION}.tar.gz
-        tar -xzf ViennaRNA-${VIENNARNA_VERSION}.tar.gz
-        cd ViennaRNA-${VIENNARNA_VERSION}
-        ./configure --without-perl --prefix="${VIENNARNA_PREFIX}"
-        CORES=$(nproc 2>/dev/null || sysctl -n hw.ncpu)
-        make -j"$CORES"
-        make install -j"$CORES"
-
-    # Expose headers & libs to the compiler / linker / CMake
-    - name: Export ViennaRNA paths
-      shell: bash
-      run: |
-        echo "VIENNARNA_LIB=${VIENNARNA_PREFIX}/lib"                                          >>"$GITHUB_ENV"
-        echo "CPATH=${VIENNARNA_PREFIX}/include:$CPATH"                                       >>"$GITHUB_ENV"
-        echo "LIBRARY_PATH=${VIENNARNA_PREFIX}/lib:$LIBRARY_PATH"                             >>"$GITHUB_ENV"
-        echo "CMAKE_PREFIX_PATH=${VIENNARNA_PREFIX}"                                          >>"$GITHUB_ENV"
-        echo "LD_LIBRARY_PATH=${VIENNARNA_PREFIX}/lib:$LD_LIBRARY_PATH"                       >>"$GITHUB_ENV"
-        echo "DYLD_FALLBACK_LIBRARY_PATH=${VIENNARNA_PREFIX}/lib:$DYLD_FALLBACK_LIBRARY_PATH" >>"$GITHUB_ENV"
-    
-    - name: Export ViennaRNA paths for Conda
-      run: |
-        echo "VIENNARNA_PREFIX=${VIENNARNA_PREFIX}" >> "$GITHUB_ENV"
-        echo "VIENNARNA_INCLUDE_DIR=${VIENNARNA_PREFIX}/include" >> "$GITHUB_ENV"
-        echo "VIENNARNA_LIB=${VIENNARNA_PREFIX}/lib" >> "$GITHUB_ENV"
 
 # -------------------- Build --------------------
     - name: Build Conda Package
