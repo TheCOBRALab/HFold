@@ -14,7 +14,6 @@ target_link_libraries(${TEST_TARGET} PUBLIC
     gtest_main
     HFoldLib
 )
-
 target_include_directories(${TEST_TARGET} PRIVATE ${CMAKE_SOURCE_DIR}/src)
 
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/tests/input DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

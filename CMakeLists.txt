@@ -156,7 +156,7 @@ set(COMMON_COMPILE_OPTIONS
 
 # Build the core logic as a library (Useful for testing)
 add_library(HFoldLib ${hfold_sources})
-target_include_directories(HFoldLib PRIVATE ${VIENNARNA_INCLUDE_DIRECTORY})
+target_include_directories(HFoldLib PUBLIC ${VIENNARNA_INCLUDE_DIRECTORY})
 target_link_libraries(HFoldLib PUBLIC ${VIENNARNA_LIBRARY})
 target_compile_options(HFoldLib PRIVATE ${COMMON_COMPILE_OPTIONS})
 

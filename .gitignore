@@ -53,4 +53,7 @@ pylib/wheelhouse/
 /test/CMakeFiles/
 /test/Makefile
 /Testing/
+/test/build/
+test/Testing
+test/tests/Testing
 

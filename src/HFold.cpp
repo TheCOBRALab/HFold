@@ -10,8 +10,13 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <filesystem>
+#include <sys/stat.h>
 
+// filesystem::exists not supported in older macOS which is needed for the Conda Build
+bool file_exists(const std::string& name) { 
+    struct stat buffer;
+    return (stat(name.c_str(), &buffer) == 0);
+}
 
 std::string getSequence(args_info a) {
 	if (a.inputs_num > 0) {
@@ -41,7 +46,7 @@ void trim(std::string& s) {
 }
 
 std::vector<RNAEntry> get_all_file_entries(const std::string& file){
-    if(!std::filesystem::exists(file)){
+    if(!file_exists(file)){
         std::cerr << "Error: Input file not found: " << file << std::endl;
         std::exit(EXIT_FAILURE);
     }
@@ -164,7 +169,7 @@ void preprocess_sequence(std::string& seq, std::string& restricted, bool noConv)
 void load_energy_parameters(const std::string& paramFile, const std::string& seq) {
     if (paramFile.empty()) return; // No parameter file provided
     
-    if (std::filesystem::exists(paramFile)) {
+    if (file_exists(paramFile)) {
         vrna_params_load(paramFile.c_str(), VRNA_PARAMETER_FORMAT_DEFAULT);
     } else if (seq.find('T') != std::string::npos) { // if T is present, load DNA parameters
         vrna_params_load_DNA_Mathews2004();
