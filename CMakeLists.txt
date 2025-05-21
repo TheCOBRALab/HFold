@@ -41,6 +41,8 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
 endif()
 
+# ------------------ Find the ViennaRNA library -----------------
+
 # Get Raw user input for library path
 set(_raw_user_input_lib "${VIENNARNA_LIB}") # user input using -D flag
 if (NOT _raw_user_input_lib)
@@ -69,6 +71,7 @@ find_library(VIENNARNA_LIBRARY
 )
 
 # ---------------- Clean include DIR path ----------------
+
 # Get user input for include directory
 set(_raw_user_input_dir "${VIENNARNA_INCLUDE_DIR}") # user input using -D flag
 if (NOT _raw_user_input_dir)
@@ -91,6 +94,9 @@ if(_clean_user_input_dir)
         CACHE PATH "Path to ViennaRNA headers" FORCE)
 endif()
 
+
+# ------------------ Find the include directory -----------------
+
 # Search for the pair_mat.h file
 find_path(VIENNARNA_INCLUDE_DIRECTORY
           NAMES  ViennaRNA/pair_mat.h
@@ -105,7 +111,7 @@ find_path(VIENNARNA_INCLUDE_DIRECTORY
 message(STATUS "VIENNARNA_LIBRARY = ${VIENNARNA_LIBRARY}")
 message(STATUS "VIENNARNA_INCLUDE_DIRECTORY = ${VIENNARNA_INCLUDE_DIRECTORY}")
 
-
+# ------------------ Check if the library and include directory were found -----------------
 
 if(NOT VIENNARNA_LIBRARY OR NOT VIENNARNA_INCLUDE_DIRECTORY)
 message(FATAL_ERROR "

@@ -1,64 +1,58 @@
 #!/usr/bin/env bash
-set -euo pipefail
 
 # ──────────────────────────────────────────────────────────────
-# 0 · Global compiler / pre-processor flags
+# 0 · Compiler flags
 # ──────────────────────────────────────────────────────────────
-
-export CXXFLAGS="${CXXFLAGS:-} -std=c++17 -include cstdint"
-if [[ "$OSTYPE" == "darwin"* ]]; then
-  export CXXFLAGS="${CXXFLAGS} -DNI_MAXHOST=1025"
-fi
 export CFLAGS="${CFLAGS:-}  -std=c11"
-export CPPFLAGS="${CPPFLAGS:-} -D_POSIX_C_SOURCE=200809L -D_GNU_SOURCE"
+export CXXFLAGS="${CXXFLAGS:-} -std=c++17 -include cstdint"
 
-# where (if any) little helper *.py files should end up
-: "${PY_VER:=}"                       # silence "unbound variable" if undefined
-PY_SITE_DIR="${PREFIX}/lib/python${PY_VER:-no}/site-packages/ViennaRNA"
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  export CXXFLAGS="${CXXFLAGS}"
+else
+  export CPPFLAGS="${CPPFLAGS:-} -D_POSIX_C_SOURCE=200809L -D_GNU_SOURCE"
+fi
+
 
 # ──────────────────────────────────────────────────────────────
 # 1 · Fresh build directory
-# ──────────────────────────────────────────────────────────────
+# ──────────────────────────────────────────────────────────────a
 rm -rf build
 mkdir  build
 cd     build
 
 # ──────────────────────────────────────────────────────────────
-# 2 · Unpack ViennaRNA and fix two outdated prototypes
+# 2 · Unpack ViennaRNA, patch and build ViennaRNA
 # ──────────────────────────────────────────────────────────────
 curl -L -O https://github.com/ViennaRNA/ViennaRNA/releases/download/v2.7.0/ViennaRNA-2.7.0.tar.gz
 tar -xf  ./ViennaRNA-2.7.0.tar.gz
-pushd   ViennaRNA-2.7.0 >/dev/null
+cd   ViennaRNA-2.7.0
 
-# Detect OS and set sed in-place flag
+# Patch needed for v2.7.0 since new compilers don't like the old code
+patch -p1 < ../../conda_recipe/patches/ViennaRNA-v2.7.patch 
+
+# Bug fixes in dlib
 if [[ "$OSTYPE" == "darwin"* ]]; then
-  # macOS/BSD sed
-  SED_INPLACE=(-i '')
-else
-  # Linux/GNU sed
-  SED_INPLACE=(-i)
-fi
-
-sed -E "${SED_INPLACE[@]}" 's@void[[:space:]]+lst_kill[^(]*\(LIST[[:space:]]*\*[[:space:]]*l[[:space:]]*,[[:space:]]*void[^(]*\([^)]*\)\)@void lst_kill (LIST *l, void (*freeNode)(void *))@' \
-    src/ViennaRNA/datastructures/lists.h
-
-sed -E "${SED_INPLACE[@]}" 's@void[[:space:]]+lst_mergesort[^(]*\(LIST[[:space:]]*\*[[:space:]]*l[[:space:]]*,[[:space:]]*int[^(]*\([^)]*\)\)@void lst_mergesort (LIST *l, int (*cmp_func)(void *, void *))@' \
-    src/ViennaRNA/datastructures/lists.h
-
-# ─  Make dlib’s Unicode code libc++-friendly  ─
-sed -E "${SED_INPLACE[@]}" 's@typedef[[:space:]]+uint32_t[[:space:]]+unichar;@using unichar = char32_t;@' \
+    # typedef with the standard UTF-32 code unit.
+    sed -i.bak 's/typedef uint32 unichar;/typedef char32_t unichar;/' \
         src/dlib-19.24/dlib/unicode/unicode.h
 
-# ──────────────────────────────────────────────────────────────
-# 3 · Configure, build, *install*  (Python bindings OFF)
-#    We still let the helper scripts be installed, just not into /RNA
-# ──────────────────────────────────────────────────────────────
-./configure --without-perl --without-python --prefix="${PREFIX}"
+    # make the new type serialisable
+    sed -i.bak '/USE_DEFAULT_INT_SERIALIZATION_FOR(uint64)/a\
+    USE_DEFAULT_INT_SERIALIZATION_FOR(char32_t)
+    ' src/dlib-19.24/dlib/serialize.h
 
+    # “template” keyword.  Add the empty <> that upstream already has.
+    sed -i.bak 's/::template go(/::template go<>(/' \
+        src/dlib-19.24/dlib/global_optimization/find_max_global.h
+fi
+
+./configure --without-perl --without-python --prefix="${PREFIX}"
 make  -j"${CPU_COUNT}"
-# override pkgpyexecdir so "make install" never touches /RNA
+
+# override pkgpyexecdir so "make install" never touches /RNA (/RNA needs sudo access)
 make  -j"${CPU_COUNT}" pkgpyexecdir="${PY_SITE_DIR}" install
-popd >/dev/null   # ← back to build/
+
+cd .. # back to build dir
 
 # ──────────────────────────────────────────────────────────────
 # 4 · CMake phase for your own project that links ViennaRNA

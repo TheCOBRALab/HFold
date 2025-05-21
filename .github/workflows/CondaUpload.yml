@@ -77,9 +77,7 @@ jobs:
 
     - name: Install just-uploaded HFold
       run: |
-        conda init
-        conda activate base
-        conda config --add channels conda-forge
-        conda install --yes cobralab::hfold=${HFOLD_VERSION} --no-channel-priority --override-channels -c cobralab
-        HFold --version
+        conda run -n base conda config --add channels conda-forge
+        conda run -n base conda install --yes cobralab::hfold=${HFOLD_VERSION} --no-channel-priority --override-channels -c cobralab
+        conda run -n base HFold --version
   

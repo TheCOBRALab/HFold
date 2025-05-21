@@ -1,0 +1,86 @@
+diff --git a/src/ViennaRNA/datastructures/lists.h b/src/ViennaRNA/datastructures/lists.h
+index d55d67d5..59a1afd2 100644
+--- a/src/ViennaRNA/datastructures/lists.h
++++ b/src/ViennaRNA/datastructures/lists.h
+@@ -55,11 +55,11 @@ LIST;
+ /*@only@*//*@out@*/ void *lst_newnode (int size);
+ void lst_freenode (/*@only@*/ void *node);
+ /*@only@*//*@out@*/  LIST *lst_init (void);
+-void lst_kill (LIST * l, void (*freeNode) ());
++void lst_kill (LIST * l, void (*freeNode) (void *));
+ void lst_insertafter (LIST * l, /*@keep@*/ void *node, void *after);
+ void *lst_deletenext (/*@only@*/ LIST * l, void *node);
+ /*@dependent@*/ void *lst_first (LIST * l);
+ /*@dependent@*/ void *lst_next (void *prev);
+-void lst_mergesort (LIST * l, int (*cmp_func) ());
++void lst_mergesort (LIST * l, int (*cmp_func) (void *, void *));
+ 
+ #endif
+diff --git a/src/ViennaRNA/subopt/subopt.c b/src/ViennaRNA/subopt/subopt.c
+index a78212bf..7d40f08e 100644
+--- a/src/ViennaRNA/subopt/subopt.c
++++ b/src/ViennaRNA/subopt/subopt.c
+@@ -345,6 +345,9 @@ free_interval_node(INTERVAL *node);
+ PRIVATE void
+ free_state_node(STATE *node);
+ 
++PRIVATE void
++free_state_node_adapter(void *node);
++
+ 
+ PRIVATE void
+ push_back(LIST  *Stack,
+@@ -628,7 +631,7 @@ vrna_subopt_cb(vrna_fold_compound_t *fc,
+        * fprintf(stderr, "maxlevel: %d\n", maxlevel);
+        */
+ 
+-      lst_kill(env->Stack, free_state_node);
++      lst_kill(env->Stack, free_state_node_adapter);
+ 
+       cb(NULL, 0, data);   /* NULL (last time to call callback function */
+ 
+@@ -804,6 +807,12 @@ free_state_node(STATE *node)
+   lst_freenode(node);
+ }
+ 
++PRIVATE void
++free_state_node_adapter(void *node)
++{
++  free_state_node((STATE *)node);
++}
++
+ 
+ PRIVATE STATE *
+ make_state(LIST *Intervals,
+diff --git a/src/bin/parallel_helpers.c b/src/bin/parallel_helpers.c
+index db7aa93d..b8a3c664 100644
+--- a/src/bin/parallel_helpers.c
++++ b/src/bin/parallel_helpers.c
+@@ -7,17 +7,21 @@
+  *
+  */
+ 
+-#ifdef _WIN32
+-#define WIN32_LEAN_AND_MEAN
+-#include <windows.h>
+-#else
+-#include <unistd.h>
+-#endif
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+ #include <errno.h>
+ 
++#ifdef _WIN32
++  #define WIN32_LEAN_AND_MEAN
++  #include <windows.h>
++#else
++  #include <unistd.h>
++  #include <sys/types.h>
++  #ifdef __APPLE__
++    #include <sys/sysctl.h>
++  #endif
++#endif
+ 
+ int
+ num_proc_cores(int  *num_cores,
