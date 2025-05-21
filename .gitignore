@@ -43,7 +43,10 @@ venv/
 .venv/
 
 # Python build
-/pylib/build/
+pylib/build/
+pylib/wheelhouse/
+*.egg-info/
+
 
 # Makefiles and tests
 /CMakeFiles/
