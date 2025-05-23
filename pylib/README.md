@@ -36,11 +36,10 @@ python3 -m pip install pybind11 setuptools scikit-build
 ## 4. Build the Python Extension
 From the project root:
 ```bash
-cd ./pylib
-python3 setup.py build_ext --inplace
+pip install -v -e ./pylib/
 ```
 
-## 5. Start Python (From the `pylib` Directory)
+## 5. Start Python
 ```bash
 python3
 ```

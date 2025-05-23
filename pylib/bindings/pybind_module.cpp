@@ -7,6 +7,7 @@
 #include <HFold.hpp>
 #include <Result.hpp>
 #include <W_final.hpp>
+#include <iostream>
 
 namespace py = pybind11;
 
@@ -29,6 +30,11 @@ namespace bindings
         bool noConv_given = false,
         bool suppress_output = false
     ) {
+        if (sequence.empty() && fileI.empty() ) {
+            std::cout << "Sequence: ";
+            std::getline(std::cin, sequence);
+        }
+
         bool input_structure_given = !restricted.empty();
         std::vector<RNAEntry> inputs = get_all_inputs(fileI, sequence, restricted);
         std::vector<std::vector<py::dict>> all_results;

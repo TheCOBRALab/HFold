@@ -61,14 +61,12 @@ jobs:
           python -m pip install --upgrade cibuildwheel scikit-build-core twine
 
       - name: Build wheels
-        run: |
-          # Set the CMake generator to Ninja for faster builds
-          cibuildwheel pylib --output-dir dist
+        run: cibuildwheel pylib --output-dir dist
 
       - name: Upload distributions
         uses: actions/upload-artifact@v4
         with:
-          name: wheels-${{ matrix.os }}
+          name: release-dists
           path: dist/
 
   pypi-publish:

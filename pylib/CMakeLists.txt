@@ -28,7 +28,13 @@ target_link_libraries(hfold_python
 
 set_target_properties(hfold_python PROPERTIES
     OUTPUT_NAME hfold
-    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/pylib"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/pylib/hfold"
+)
+
+add_custom_command(TARGET hfold_python POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy
+    "$<TARGET_FILE:hfold_python>"
+    "${CMAKE_SOURCE_DIR}/pylib/$<TARGET_FILE_NAME:hfold_python>"
 )
 
 include(GNUInstallDirs)

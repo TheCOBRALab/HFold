@@ -1,19 +1,19 @@
 [build-system]
 requires = [
   "scikit-build-core>=0.8.0",
-  "pybind11>=2.11",     # CMake finds this via find_package(pybind11 CONFIG REQUIRED)
+  "pybind11>=2.11",
   "cmake>=3.10",
   "wheel"
 ]
 build-backend = "scikit_build_core.build"
 
-[tool.scikit-build]          # 👈 new section
-cmake.source-dir = ".."      # relative to pylib/
+[tool.scikit-build] 
+cmake.source-dir = ".." # Parent directory of pylib
 cmake.args = ["-DBUILD_PYTHON=ON"]
 
 [project]
 name = "hfold"
-version = "0.0.3"
+version = "0.0.4"
 authors = [{ name = "COBRALab" }]
 description = "HFold: Python bindings for the HFold C++ library"
 readme = "README.md"
