@@ -9,7 +9,7 @@ build-backend = "scikit_build_core.build"
 
 [tool.scikit-build] 
 cmake.source-dir = ".." # Parent directory of pylib
-cmake.args = ["-DBUILD_PYTHON=ON"]
+cmake.args = ["-DBUILD_PYTHON=ON", "-DENABLE_TESTS=OFF"]
 
 [project]
 name = "hfold"
