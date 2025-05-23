@@ -45,7 +45,10 @@ venv/
 # Python build
 pylib/build/
 pylib/wheelhouse/
+pylib/_skbuild/
+_skbuild/
 *.egg-info/
+*.whl
 
 
 # Makefiles and tests

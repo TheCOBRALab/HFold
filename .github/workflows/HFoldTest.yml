@@ -1,6 +1,7 @@
 name: CMake on multiple platforms
 
 on:
+  workflow_dispatch:
   push:         { branches: [master] }
   pull_request: { branches: [master] }
 
@@ -83,6 +84,14 @@ jobs:
         cd ${{ github.workspace }}/pylib
         python3 -m venv venv
         source venv/bin/activate
-        python3 -m pip install pybind11 setuptools
+        
+        if [[ "$RUNNER_OS" == "Linux" ]]; then
+          sudo apt update
+          sudo apt install -y pybind11-dev
+        elif [[ "$RUNNER_OS" == "macOS" ]]; then
+          brew install pybind11
+        fi
+
+        python3 -m pip install pybind11 setuptools scikit-build
         python3 setup.py build_ext --inplace
         python3 -c "import hfold; print('hfold import successful'); hfold.hfold(\"AGGGCUAUCCUU\", suppress_output=True); print('hfold function call successful')"

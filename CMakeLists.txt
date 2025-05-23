@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.15)
 project(HFold
     LANGUAGES C CXX
     DESCRIPTION "RNA folding prediction tool"
@@ -9,6 +9,7 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 option(ENABLE_TESTS "Build unit tests" ON)
+option(BUILD_PYTHON "Build Python bindings using pybind11" OFF)
 
 if (NOT ENABLE_TESTS)
     message(STATUS "Unit tests are disabled. To enable them, set -DBUILD_TESTING=ON")
@@ -169,3 +170,37 @@ target_compile_options(HFold PRIVATE ${COMMON_COMPILE_OPTIONS})
 
 # Install rule (For Conda Packaging)
 install(TARGETS HFold RUNTIME DESTINATION bin)
+
+if (BUILD_PYTHON)
+# ---- Python bindings using pybind11 ----------------
+find_package(pybind11 CONFIG REQUIRED)
+
+pybind11_add_module(hfold_python
+    pylib/bindings/pybind_module.cpp
+    ${hfold_sources}
+)
+
+target_include_directories(hfold_python
+    PRIVATE
+        ${VIENNARNA_INCLUDE_DIRECTORY}
+        ${PROJECT_SOURCE_DIR}/src 
+)
+
+target_link_libraries(hfold_python
+    PRIVATE
+        HFoldLib
+        ${VIENNARNA_LIBRARY}
+)
+
+# The Python wheel must contain a file called hfold.*.so / .pyd.
+set_target_properties(hfold_python PROPERTIES
+    OUTPUT_NAME hfold
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/pylib"
+)
+
+# ---- install so scikit-build can package it --------------------------------
+include(GNUInstallDirs)     # for ${CMAKE_INSTALL_LIBDIR}
+install(TARGETS hfold_python
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+
+endif()

@@ -1,3 +1,36 @@
 [build-system]
-requires = ["setuptools>=42", "wheel", "pybind11"]
-build-backend = "setuptools.build_meta"
+requires = [
+  "scikit-build-core>=0.8.0",
+  "pybind11>=2.11",     # CMake finds this via find_package(pybind11 CONFIG REQUIRED)
+  "cmake>=3.10",
+  "wheel"
+]
+build-backend = "scikit_build_core.build"
+
+[tool.scikit-build]          # 👈 new section
+cmake.source-dir = ".."      # relative to pylib/
+cmake.args = ["-DBUILD_PYTHON=ON"]
+
+[project]
+name = "hfold"
+version = "0.0.1"
+authors = [{ name = "COBRALab" }]
+description = "HFold: Python bindings for the HFold C++ library"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Operating System :: Unix",
+  "Operating System :: MacOS"
+]
+
+[tool.setuptools]
+packages = ["hfold"]
+
+[tool.cibuildwheel]
+build = "*"
+skip = "pp* *-musllinux*"
+test-skip = "*"
+archs = ["auto"]
+before-build = "bash ./pylib/build_vienna.sh"
+environment = {VIENNARNA_LIB = "/tmp/vienna-cache/lib", VIENNARNA_INCLUDE_DIR = "/tmp/vienna-cache/include" }

@@ -1,14 +1,7 @@
-# This workflow will upload a Python Package to PyPI when a release is created
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python#publishing-to-package-registries
-
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
 name: Upload Python Package
 
 on:
+  workflow_dispatch:
   release:
     types: [published]
 
@@ -21,86 +14,79 @@ permissions:
 
 jobs:
   release-build:
-    runs-on: ubuntu-latest
-
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    # -------------------- ViennaRNA --------------------
-    - name: Restore ViennaRNA from cache
-    id: cache-viennarna
-    uses: actions/cache@v4
-    with:
-        path: ${{ env.VIENNARNA_PREFIX }}
-        key: viennarna-${{ env.VIENNARNA_VERSION }}-${{ runner.os }}-${{ runner.arch }}
+      # -------------------- ViennaRNA --------------------
+      - name: Restore ViennaRNA from cache
+        id: cache-viennarna
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.VIENNARNA_PREFIX }}
+          key: viennarna-${{ env.VIENNARNA_VERSION }}-${{ runner.os }}-${{ runner.arch }}
 
-    - name: Build & install ViennaRNA
-    if: steps.cache-viennarna.outputs.cache-hit != 'true'
-    run: |
-        curl -L -O https://github.com/ViennaRNA/ViennaRNA/releases/download/v${VIENNARNA_VERSION}/ViennaRNA-${VIENNARNA_VERSION}.tar.gz
-        tar -xzf ViennaRNA-${VIENNARNA_VERSION}.tar.gz
-        cd ViennaRNA-${VIENNARNA_VERSION}
-        ./configure --without-perl --prefix="${VIENNARNA_PREFIX}"
-        CORES=$(nproc 2>/dev/null || sysctl -n hw.ncpu)
-        make -j"$CORES"
-        make install -j"$CORES"
+      - name: Build & install ViennaRNA
+        if: steps.cache-viennarna.outputs.cache-hit != 'true'
+        run: |
+          curl -L -O https://github.com/ViennaRNA/ViennaRNA/releases/download/v${VIENNARNA_VERSION}/ViennaRNA-${VIENNARNA_VERSION}.tar.gz
+          tar -xzf ViennaRNA-${VIENNARNA_VERSION}.tar.gz
+          cd ViennaRNA-${VIENNARNA_VERSION}
+          ./configure --without-perl --prefix="${VIENNARNA_PREFIX}"
+          CORES=$(nproc 2>/dev/null || sysctl -n hw.ncpu)
+          make -j"$CORES"
+          make install -j"$CORES"
 
-    # Expose headers & libs to the compiler / linker / CMake
-    - name: Export ViennaRNA paths
-    shell: bash
-    run: |
-        echo "VIENNARNA_LIB=${VIENNARNA_PREFIX}/lib"                                          >>"$GITHUB_ENV"
-        echo "CPATH=${VIENNARNA_PREFIX}/include:$CPATH"                                       >>"$GITHUB_ENV"
-        echo "LIBRARY_PATH=${VIENNARNA_PREFIX}/lib:$LIBRARY_PATH"                             >>"$GITHUB_ENV"
-        echo "CMAKE_PREFIX_PATH=${VIENNARNA_PREFIX}"                                          >>"$GITHUB_ENV"
-        echo "LD_LIBRARY_PATH=${VIENNARNA_PREFIX}/lib:$LD_LIBRARY_PATH"                       >>"$GITHUB_ENV"
-        echo "DYLD_FALLBACK_LIBRARY_PATH=${VIENNARNA_PREFIX}/lib:$DYLD_FALLBACK_LIBRARY_PATH" >>"$GITHUB_ENV"
+      - name: Export ViennaRNA paths
+        shell: bash
+        run: |
+          echo "VIENNARNA_LIB=${VIENNARNA_PREFIX}/lib"                                          >>"$GITHUB_ENV"
+          echo "CPATH=${VIENNARNA_PREFIX}/include:$CPATH"                                       >>"$GITHUB_ENV"
+          echo "LIBRARY_PATH=${VIENNARNA_PREFIX}/lib:$LIBRARY_PATH"                             >>"$GITHUB_ENV"
+          echo "CMAKE_PREFIX_PATH=${VIENNARNA_PREFIX}"                                          >>"$GITHUB_ENV"
+          echo "LD_LIBRARY_PATH=${VIENNARNA_PREFIX}/lib:$LD_LIBRARY_PATH"                       >>"$GITHUB_ENV"
+          echo "DYLD_FALLBACK_LIBRARY_PATH=${VIENNARNA_PREFIX}/lib:$DYLD_FALLBACK_LIBRARY_PATH" >>"$GITHUB_ENV"
 
-    # -------------------- Python Build --------------------
-    - uses: actions/setup-python@v5
-      with:
-        python-version: "3.x"
+      # -------------------- Python Build --------------------
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
 
-        
-    - name: Install cibuildwheel
-    run: python -m pip install cibuildwheel
-    
-    - name: Build wheels
-    run: |
-        cibuildwheel --output-dir dist
-    
-    - name: Upload distributions
+      - name: Install cibuildwheel
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade cibuildwheel scikit-build-core twine
+
+      - name: Build wheels
+        run: |
+          # Set the CMake generator to Ninja for faster builds
+          cibuildwheel pylib --output-dir dist
+
+      - name: Upload distributions
         uses: actions/upload-artifact@v4
         with:
-        name: release-dists
-        path: dist/
+          name: wheels-${{ matrix.os }}
+          path: dist/
 
-    pypi-publish:
-        runs-on: ubuntu-latest
-        needs:
-        - release-build
-        permissions:
-        id-token: write
+  pypi-publish:
+    runs-on: ubuntu-latest
+    needs: release-build
+    permissions:
+      id-token: write
+    environment:
+      name: pypi
 
-        # Dedicated environments with protections for publishing are strongly recommended.
-        # For more information, see: https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment#deployment-protection-rules
-        environment:
-        name: pypi
-        # OPTIONAL: uncomment and update to include your PyPI project URL in the deployment status:
-        # url: https://pypi.org/p/YOURPROJECT
-        #
-        # ALTERNATIVE: if your GitHub Release name is the PyPI project version string
-        # ALTERNATIVE: exactly, uncomment the following line instead:
-        # url: https://pypi.org/project/YOURPROJECT/${{ github.event.release.name }}
+    steps:
+      - name: Retrieve release distributions
+        uses: actions/download-artifact@v4
+        with:
+          name: release-dists
+          path: dist/
 
-        steps:
-        - name: Retrieve release distributions
-            uses: actions/download-artifact@v4
-            with:
-            name: release-dists
-            path: dist/
-
-        - name: Publish release distributions to PyPI
-            uses: pypa/gh-action-pypi-publish@release/v1
-            with:
-            packages-dir: dist/
+      - name: Publish release distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist/

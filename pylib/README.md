@@ -28,7 +28,9 @@ source venv/bin/activate
 ## 3. Install Python Dependencies
 Make sure you have pybind11 and setuptools installed
 ```bash
-python3 -m pip install pybind11 setuptools
+sudo apt install pybind11-dev # linux
+brew install pybind11 # MacOS
+python3 -m pip install pybind11 setuptools scikit-build
 ```
 
 ## 4. Build the Python Extension
@@ -72,3 +74,11 @@ hfold.hfold(subopt=2, fileI="./sample_inputs/sample.txt", param_file="../params/
 | `param_file`     | str    | Thermodynamic parameters file   |
 | `noConv_given`   | bool   | Do not convert DNA into RNA     |
 | `suppress_output`| bool   | Suppress console output         |
+
+
+Build wheels 
+```bash
+python -m pip install --upgrade cibuildwheel scikit-build-core twine pybind11 setuptools # install pre-req
+cibuildwheel pylib --output-dir dist # build
+python -m twine upload dist/* # upload
+```

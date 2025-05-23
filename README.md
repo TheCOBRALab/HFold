@@ -5,7 +5,7 @@ HFold is an algorithm for predicting the pseudoknotted secondary structures of R
 HFold needs a 64bit Linux or macOS operating system to run
 
 ### Software Requirements:
-- CMake 3.9 or greater
+- CMake 3.15 or greater
 - ViennaRNA 2.7.0
 
 ### ViennaRNA package installation
