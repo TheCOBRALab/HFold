@@ -49,7 +49,9 @@ pylib/_skbuild/
 _skbuild/
 *.egg-info/
 *.whl
-
+cd ..
+dist/
+*.pyc
 
 # Makefiles and tests
 /CMakeFiles/

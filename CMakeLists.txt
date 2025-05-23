@@ -172,35 +172,5 @@ target_compile_options(HFold PRIVATE ${COMMON_COMPILE_OPTIONS})
 install(TARGETS HFold RUNTIME DESTINATION bin)
 
 if (BUILD_PYTHON)
-# ---- Python bindings using pybind11 ----------------
-find_package(pybind11 CONFIG REQUIRED)
-
-pybind11_add_module(hfold_python
-    pylib/bindings/pybind_module.cpp
-    ${hfold_sources}
-)
-
-target_include_directories(hfold_python
-    PRIVATE
-        ${VIENNARNA_INCLUDE_DIRECTORY}
-        ${PROJECT_SOURCE_DIR}/src 
-)
-
-target_link_libraries(hfold_python
-    PRIVATE
-        HFoldLib
-        ${VIENNARNA_LIBRARY}
-)
-
-# The Python wheel must contain a file called hfold.*.so / .pyd.
-set_target_properties(hfold_python PROPERTIES
-    OUTPUT_NAME hfold
-    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/pylib"
-)
-
-# ---- install so scikit-build can package it --------------------------------
-include(GNUInstallDirs)     # for ${CMAKE_INSTALL_LIBDIR}
-install(TARGETS hfold_python
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
-
+    add_subdirectory(pylib)
 endif()

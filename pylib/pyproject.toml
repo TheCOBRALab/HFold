@@ -13,7 +13,7 @@ cmake.args = ["-DBUILD_PYTHON=ON"]
 
 [project]
 name = "hfold"
-version = "0.0.1"
+version = "0.0.3"
 authors = [{ name = "COBRALab" }]
 description = "HFold: Python bindings for the HFold C++ library"
 readme = "README.md"
