@@ -116,7 +116,7 @@ const std::string traceback_cases_output =
     "((((((.....[[[[[[....[[[[[[))))))......]]]]]]....((((((......))))))...(((...)))]]]]]] (-26.14)\n"
     ">Multiloop_that_spans_a_band_with_extra2\n"
     "GGGGGGAAAAAGGGGGGAAAAGGGGGGCCCCCCAAAAAACCCCCCAAAAGGGGGGAAAAAACCCCCCAAAGGGAAACCCCCCCCC\n"
-    "[[[[[[.....[[[[[[....((((((]]]]]]......]]]]]]....((((((......))))))...((....)).)))))) (-30.99)\n";
+    "...........((((((....((((((............))))))....((((((......))))))...((....)).)))))) (-28.51)\n";
 
 
 const std::string input_file_and_sequence_output =     
@@ -146,4 +146,4 @@ const std::string input_file_and_sequence_output =
     "((((((.....[[[[[[....[[[[[[))))))......]]]]]]....((((((......))))))...(((...)))]]]]]] (-26.14)\n"
     ">Multiloop_that_spans_a_band_with_extra2\n"
     "GGGGGGAAAAAGGGGGGAAAAGGGGGGCCCCCCAAAAAACCCCCCAAAAGGGGGGAAAAAACCCCCCAAAGGGAAACCCCCCCCC\n"
-    "[[[[[[.....[[[[[[....((((((]]]]]]......]]]]]]....((((((......))))))...((....)).)))))) (-30.99)\n";
+    "...........((((((....((((((............))))))....((((((......))))))...((....)).)))))) (-28.51)\n";

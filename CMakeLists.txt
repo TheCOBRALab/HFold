@@ -157,14 +157,14 @@ set(COMMON_COMPILE_OPTIONS
 
 # Build the core logic as a library (Useful for testing)
 add_library(HFoldLib ${hfold_sources})
-target_include_directories(HFoldLib PUBLIC ${VIENNARNA_INCLUDE_DIRECTORY})
+target_include_directories(HFoldLib SYSTEM PUBLIC ${VIENNARNA_INCLUDE_DIRECTORY})
 target_link_libraries(HFoldLib PUBLIC ${VIENNARNA_LIBRARY})
 target_compile_options(HFoldLib PRIVATE ${COMMON_COMPILE_OPTIONS})
 
 # Build the main executable
 add_executable(HFold src/main.cpp)
 target_sources(HFold PRIVATE ${hfold_sources}) # Re-add for Conda packaging (doesn't work without this for some reason)
-target_include_directories(HFold PRIVATE ${VIENNARNA_INCLUDE_DIRECTORY}) 
+target_include_directories(HFold SYSTEM PRIVATE ${VIENNARNA_INCLUDE_DIRECTORY}) 
 target_link_libraries(HFold PRIVATE HFoldLib)
 target_compile_options(HFold PRIVATE ${COMMON_COMPILE_OPTIONS})
 

@@ -834,7 +834,7 @@ void expand_hotspot(s_energy_matrix *V, Hotspot &hotspot, int n){
 	energy_t dangle_penalty = vrna_E_ext_stem(tt, si1, sj1, V->params_);
 
 
-    double energy = V->get_energy(hotspot.get_left_outer_index(),hotspot.get_right_outer_index());
+    double energy = V->get_energy(hotspot.get_left_outer_index(), hotspot.get_right_outer_index());
 
     // printf("here and %d\n",energy);
     //printf("energy: %lf, AU_total: %d, dangle_top_total: %d, dangle_bot_total: %d\n",energy,non_gc_penalty,dangle_top_penalty,dangle_bot_penalty);
@@ -848,14 +848,14 @@ void expand_hotspot(s_energy_matrix *V, Hotspot &hotspot, int n){
 
 //Mateo 13 Sept 2023
 //look for every possible hairpin loop, and try to add a arc to form a larger stack with at least min_stack_size bases
-void get_hotspots(std::string seq,std::vector<Hotspot> &hotspot_list,int max_hotspot, vrna_param_s *params){
+void get_hotspots(std::string seq, std::vector<Hotspot> &hotspot_list, int max_hotspot, vrna_param_s *params){
     
 	int n = seq.length();
 	s_energy_matrix *V;
 	make_pair_matrix();
 	short *S_ = encode_sequence(seq.c_str(),0);
 	short *S1_ = encode_sequence(seq.c_str(),1);
-	V = new s_energy_matrix (seq,n,S_,S1_,params);
+	V = new s_energy_matrix (seq, n, S_, S1_, params);
     int min_bp_distance = 3;
     int min_stack_size = 3; //the hotspot must be a stack of size >= 3
     // Hotspot current_hotspot;
@@ -884,11 +884,11 @@ void get_hotspots(std::string seq,std::vector<Hotspot> &hotspot_list,int max_hot
     }
 
     //make sure we only keep top 20 hotspot with lowest energy
-    std::sort(hotspot_list.begin(), hotspot_list.end(),compare_hotspot_ptr);
+    std::sort(hotspot_list.begin(), hotspot_list.end(), compare_hotspot_ptr);
     while((int) hotspot_list.size() > max_hotspot){
         hotspot_list.pop_back();
     }
-
+	
     //if no hotspot found, add all . as restricted
     if((int) hotspot_list.size() == 0){
         Hotspot hotspot(1,n,n+1);
@@ -902,6 +902,16 @@ void get_hotspots(std::string seq,std::vector<Hotspot> &hotspot_list,int max_hot
     return;
 }
 
+
 bool compare_hotspot_ptr(Hotspot &a, Hotspot &b) { 
+	if (a.get_energy() != b.get_energy())
+		return (a.get_energy() < b.get_energy());
+
+	// Tie-breaker: compare by structure
+	if (a.get_structure() != b.get_structure())
+		return (a.get_structure() < b.get_structure());
+	
+	// Final fallback
+	// If all else is equal, compare by energy again
     return (a.get_energy() < b.get_energy()); 
 }

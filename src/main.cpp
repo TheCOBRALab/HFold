@@ -24,7 +24,6 @@ int main(int argc, char* argv[]) {
     bool pk_only           = a.pk_only_given;
     int dangles            = a.dangles_given         ? dangle_model   : 2;
     std::string paramFile  = a.paramFile_given       ? parameter_file : "params/rna_DirksPierce09.par";
-    std::cout << paramFile << std::endl;
 
     std::vector<RNAEntry> inputs = get_all_inputs(fileI, sequence, restricted);
 

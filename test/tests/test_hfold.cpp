@@ -62,12 +62,12 @@ TEST(SimpleHFold, Suboptimal){
     EXPECT_EQ(result[1].get_final_energy(), -0.33);
 }
 
-TEST(SimpleHFold, WeirdEdgeCase){
+TEST(SimpleHFold, MultipleSameEnergies){
     HFoldParams params;
     params.sequence = "GGGGGGAAAAAGGGGGGAAAAGGGGGGCCCCCCAAAAAACCCCCCAAAAGGGGGGAAAAAACCCCCCAAAGGGAAACCCCCCCCC";
     Result result = hfold_test(params)[0][0];
-    EXPECT_EQ(result.get_final_structure(), "[[[[[[.....[[[[[[....((((((]]]]]]......]]]]]]....((((((......))))))...((....)).))))))");
-    EXPECT_EQ(result.get_final_energy(), -30.99);
+    EXPECT_EQ(result.get_final_structure(), "...........((((((....((((((............))))))....((((((......))))))...((....)).))))))");
+    EXPECT_EQ(result.get_final_energy(), -28.51);
 }
 
 TEST(SimpleHFold, DanglesAndRestriction) {
