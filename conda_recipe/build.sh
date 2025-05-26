@@ -27,10 +27,7 @@ curl -L -O https://github.com/ViennaRNA/ViennaRNA/releases/download/v2.7.0/Vienn
 tar -xf  ./ViennaRNA-2.7.0.tar.gz
 cd   ViennaRNA-2.7.0
 
-# Patch needed for v2.7.0 since new compilers don't like the old code
-patch -p1 < ../../conda_recipe/patches/ViennaRNA-v2.7.patch 
-
-# Bug fixes in dlib
+# Bug fixes in dlib until ViennaRNA updates to a newer version
 if [[ "$OSTYPE" == "darwin"* ]]; then
     # typedef with the standard UTF-32 code unit.
     sed -i.bak 's/typedef uint32 unichar;/typedef char32_t unichar;/' \
