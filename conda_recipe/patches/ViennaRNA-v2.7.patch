@@ -52,35 +52,3 @@ index a78212bf..7d40f08e 100644
  
  PRIVATE STATE *
  make_state(LIST *Intervals,
-diff --git a/src/bin/parallel_helpers.c b/src/bin/parallel_helpers.c
-index db7aa93d..b8a3c664 100644
---- a/src/bin/parallel_helpers.c
-+++ b/src/bin/parallel_helpers.c
-@@ -7,17 +7,21 @@
-  *
-  */
- 
--#ifdef _WIN32
--#define WIN32_LEAN_AND_MEAN
--#include <windows.h>
--#else
--#include <unistd.h>
--#endif
- #include <stdio.h>
- #include <stdlib.h>
- #include <string.h>
- #include <errno.h>
- 
-+#ifdef _WIN32
-+  #define WIN32_LEAN_AND_MEAN
-+  #include <windows.h>
-+#else
-+  #include <unistd.h>
-+  #include <sys/types.h>
-+  #ifdef __APPLE__
-+    #include <sys/sysctl.h>
-+  #endif
-+#endif
- 
- int
- num_proc_cores(int  *num_cores,
