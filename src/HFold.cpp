@@ -282,7 +282,8 @@ void output_results(
     const std::string& fileO,
     int suboptCount,
     const std::string& name,
-    const std::size_t input_count
+    const std::size_t input_count,
+    const bool skip_duplicates
 ) {
     int number_of_output = std::min(results.size(), static_cast<std::size_t>(suboptCount));
 
@@ -298,6 +299,9 @@ void output_results(
                 << " (" << results[0].get_final_energy() << ")" << std::endl;
         } else {
             for (int i = 0; i < number_of_output; i++) {
+                if (skip_duplicates && i && results[i].get_final_structure() == results[i - 1].get_final_structure()){ // skip duplicates
+                    continue;
+                }
                 out << "Restricted_" << i << ": " << results[i].get_restricted() << std::endl;
                 out << "Result_" << i << ":     " << results[i].get_final_structure()
                     << " (" << results[i].get_final_energy() << ")" << std::endl;
@@ -307,17 +311,22 @@ void output_results(
         if (!name.empty() && input_count > 1){
             std::cout << ">" << name << std::endl; 
         }
-        std::cout << seq << std::endl;
+        
         if (results.size() == 1) { 
-			// std::cout << "Restricted_" << 0 << ": " << results[0].get_restricted() << std::endl;
-            std::cout << results[0].get_final_structure()
+            std::cout << "Sequence:        " << seq << std::endl;
+			std::cout << "Restricted:      " << results[0].get_restricted() << std::endl;
+            std::cout << "Final Structure: " << results[0].get_final_structure()
                       << " (" << results[0].get_final_energy() << ")" << std::endl;
         } else {
+            int alignment = std::floor(std::log10(number_of_output));
+            std::cout << "Sequence:     " << std::string(alignment, ' ') << seq << std::endl;
             for (int i = 0; i < number_of_output; i++) {
-                if (i && results[i].get_final_structure() == results[i - 1].get_final_structure()) // skip duplicates
+                alignment = std::floor(std::log10(number_of_output)) - (std::floor(std::log10(i !=0 ? i : 1)));
+                if (skip_duplicates && i && results[i].get_final_structure() == results[i - 1].get_final_structure()){ // skip duplicates
                     continue;
-                std::cout << "Restricted_" << i << ": " << results[i].get_restricted() << std::endl;
-                std::cout << "Result_" << i << ":     " << results[i].get_final_structure()
+                }
+                std::cout << "Restricted_" << i << ": " << std::string(alignment, ' ') << results[i].get_restricted() << std::endl;
+                std::cout << "Result_" << i << ":     " << std::string(alignment, ' ') << results[i].get_final_structure()
                           << " (" << results[i].get_final_energy() << ")" << std::endl;
             }
         }

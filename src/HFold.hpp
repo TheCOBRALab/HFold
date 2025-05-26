@@ -42,6 +42,7 @@ void output_results(
     const std::string& fileO,
     int suboptCount,
     const std::string& name = "",
-    const std::size_t input_count = 1
+    const std::size_t input_count = 1,
+    const bool skip_duplicates = false
 );
 #endif // HFOLD_H
