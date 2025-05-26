@@ -113,7 +113,10 @@ const std::string traceback_cases_output =
     "((((((.....[[[[[[....[[[[[[))))))......]]]]]]....((((((......))))))......]]]]]] (-25.71)\n"
     ">Multiloop_that_spans_a_band_with_extra\n"
     "GGGGGGAAAAAGGGGGGAAAAGGGGGGCCCCCCAAAAAACCCCCCAAAAGGGGGGAAAAAACCCCCCAAAGGGAAACCCCCCCCC\n"
-    "((((((.....[[[[[[....[[[[[[))))))......]]]]]]....((((((......))))))...(((...)))]]]]]] (-26.14)\n";
+    "((((((.....[[[[[[....[[[[[[))))))......]]]]]]....((((((......))))))...(((...)))]]]]]] (-26.14)\n"
+    ">Multiloop_that_spans_a_band_with_extra2\n"
+    "GGGGGGAAAAAGGGGGGAAAAGGGGGGCCCCCCAAAAAACCCCCCAAAAGGGGGGAAAAAACCCCCCAAAGGGAAACCCCCCCCC\n"
+    "[[[[[[.....[[[[[[....((((((]]]]]]......]]]]]]....((((((......))))))...((....)).)))))) (-30.99)\n";
 
 
 const std::string input_file_and_sequence_output =     
@@ -140,38 +143,7 @@ const std::string input_file_and_sequence_output =
     "((((((.....[[[[[[....[[[[[[))))))......]]]]]]....((((((......))))))......]]]]]] (-25.71)\n"
     ">Multiloop_that_spans_a_band_with_extra\n"
     "GGGGGGAAAAAGGGGGGAAAAGGGGGGCCCCCCAAAAAACCCCCCAAAAGGGGGGAAAAAACCCCCCAAAGGGAAACCCCCCCCC\n"
-    "((((((.....[[[[[[....[[[[[[))))))......]]]]]]....((((((......))))))...(((...)))]]]]]] (-26.14)\n";
-
-    const std::string input_and_output_file_output =
-    ">Console Sequence\n"
-    "AUGCUAGC\n"
-    "Restricted_0: ..........\n"
-    "Result_0:     ........ (0)\n"
-    ">VP_case1\n"
-    "GGGGGAAAAAAAGGGGGGGGGGAAAAAAAACCCCCAAAAAACCCCCCCCCC\n"
-    "Restricted_0: (((((.........................)))))................\n"
-    "Result_0:     (((((.......[[[[[[[[[[........)))))......]]]]]]]]]] (-20.16)\n"
-    ">VP_case2\n"
-    "GGGGGAAAAAAAGGGGGGGGGGAAAAAAAACCCCCAAAAAACCCCCCCCCC\n"
-    "Restricted_0: ............((((((((((...................))))))))))\n"
-    "Result_0:     [[[[[.......((((((((((........]]]]]......)))))))))) (-20.16)\n"
-    ">VP_case3\n"
-    "CCCCCCCCCCAAAAAAGGGGGAAAGGGGGGGGGGAAAAGGGGGGGGGGAAAAAAAACCCCCAAAAAACCCCCCCCCC\n"
-    "Restricted_0: ((((((((((..............))))))))))....((((((((((...................))))))))))\n"
-    "Result_0:     ((((((((((......[[[[[...))))))))))....((((((((((........]]]]]......)))))))))) (-34.62)\n"
-    ">VP_case1_and_case2\n"
-    "CCCCCCCCCCAAAAAAGGGGGAAAGGGGGGGGGGAAAAGGGGGGGGGGAAAAAAAACCCCCAAAAAACCCCCCCCCC\n"
-    "Restricted_0: ................(((((...................................)))))................\n"
-    "Result_0:     [[[[[[[[[[......(((((...]]]]]]]]]]....[[[[[[[[[[........)))))......]]]]]]]]]] (-34.62)\n"
-    ">Multiloop_with_pseudoknot\n"
-    "AAAAAAGGGGGAAAAAAAGGGGGGGGGGAAAAAAAACCCCCAAAAAACCCCCCCCCCUUUUUU\n"
-    "Restricted_0: (((((((((((.........................)))))................))))))\n"
-    "Result_0:     (((((((((((.......[[[[[[[[[[........)))))......]]]]]]]]]])))))) (-8.71)\n"
-    ">Multiloop_that_spans_a_band\n"
-    "GGGGGGAAAAAGGGGGGAAAAGGGGGGCCCCCCAAAAAACCCCCCAAAAGGGGGGAAAAAACCCCCCAAAAAACCCCCC\n"
-    "Restricted_0: ((((((.....................))))))................((((((......))))))............\n"
-    "Result_0:     ((((((.....[[[[[[....[[[[[[))))))......]]]]]]....((((((......))))))......]]]]]] (-25.71)\n"
-    ">Multiloop_that_spans_a_band_with_extra\n"
+    "((((((.....[[[[[[....[[[[[[))))))......]]]]]]....((((((......))))))...(((...)))]]]]]] (-26.14)\n"
+    ">Multiloop_that_spans_a_band_with_extra2\n"
     "GGGGGGAAAAAGGGGGGAAAAGGGGGGCCCCCCAAAAAACCCCCCAAAAGGGGGGAAAAAACCCCCCAAAGGGAAACCCCCCCCC\n"
-    "Restricted_0: ((((((.....................))))))................((((((......))))))...(((...)))......\n"
-    "Result_0:     ((((((.....[[[[[[....[[[[[[))))))......]]]]]]....((((((......))))))...(((...)))]]]]]] (-26.14)\n";
+    "[[[[[[.....[[[[[[....((((((]]]]]]......]]]]]]....((((((......))))))...((....)).)))))) (-30.99)\n";

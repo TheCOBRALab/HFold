@@ -50,31 +50,75 @@ std::vector<RNAEntry> get_all_file_entries(const std::string& file){
         std::cerr << "Error: Input file not found: " << file << std::endl;
         std::exit(EXIT_FAILURE);
     }
+
+    // state machine to parse the file
+    #define UNINITIALIZED -1
+    #define NAME 0
+    #define SEQUENCE 1
+    #define STRUCTURE 2
+
     std::ifstream in(file.c_str());
     std::string line;
     RNAEntry current;
     std::vector<RNAEntry> entries;
-    int state = 0;
+    int state = UNINITIALIZED;
+    int line_number = 0;
+
     while(getline(in, line)){
+        ++line_number;
         trim(line);
         if (line.empty()) continue;
+
+        // Check if the line is the name of the entry
+        if ((state == NAME || state == UNINITIALIZED) && (line[0] != '>')) {
+            std::cerr << "Error: Expected '>' at the beginning of the line: " << line << ". Line number: " << line_number <<std::endl;
+            exit(EXIT_FAILURE);
+        }
+
         if (line[0] == '>'){
-            if (!current.sequence.empty() && !current.structure.empty()) {
+
+            if (!current.name.empty() && !current.sequence.empty() && current.structure.empty()) {
+                current.structure = "";
+            }
+
+            if (state != UNINITIALIZED) { // valid entry, save it
+                if (current.sequence.empty() && current.structure.empty()) {
+                    std::cerr << "Warning: Sequence and structure are empty for entry: " << current.name << ". Line number: " << line_number << ". Skipping..."<<  std::endl;
+                }
                 entries.push_back(current);
                 current = RNAEntry();
             }
+
             current.name = line.substr(1);
-            state = 1;
-        } else if (state == 1){
+            state = SEQUENCE;
+
+        } else if (state == SEQUENCE){
+            if (!validateSequence(line, false)) {
+                std::cerr << "Error: Sequence is invalid for entry: " << current.name  << ". Line number: " << line_number << std::endl;
+                exit(EXIT_FAILURE);
+            }
             current.sequence = line;
-            state = 2;
-        } else if (state == 2) {
+            state = STRUCTURE;
+            
+        } else if (state == STRUCTURE) {
+            if (!validateStructure(current.sequence, line, false)) {
+                std::cerr << "Error: Structure is invalid for entry: " << current.name << ". Line number: " << line_number  << std::endl;
+                exit(EXIT_FAILURE);
+            }
             current.structure = line;
-            state = 0;
+            state = NAME;
+        } else {
+            // Should never reach here
+            std::cerr << "Error: Unexpected state at line " << line_number << ": " << line << ". Line number: " << line_number  << std::endl;
+            exit(EXIT_FAILURE);
         }
     }
 
-    if (!current.sequence.empty() && !current.structure.empty()) {
+    // Handle the last entry
+    if (!current.name.empty() && !current.sequence.empty()) {
+        if (current.structure.empty()) {
+            current.structure = "";
+        }
         entries.push_back(current);
     }
 
@@ -95,36 +139,50 @@ std::vector<RNAEntry> get_all_inputs(const std::string& fileI, const std::string
 }
 
 //check length and if any characters other than ._()
-void validateStructure(std::string sequence, std::string structure){
+bool validateStructure(std::string& sequence, std::string& structure, bool exit_on_invalid){
 	if(structure.length() != sequence.length()){
-		std::cout << " The length of the sequence and corresponding structure must have the same length" << std::endl;
-		exit(EXIT_FAILURE);
+        if (exit_on_invalid) {
+            std::cerr << "Error: The length of the sequence and structure must be the same." << std::endl;
+            exit(EXIT_FAILURE);
+        }
+        return false;
 	}
 
 	//check if any characters are not ._()
 	for(char c : structure) {
 		if (!(c == '.' || c == '_' || c == '(' || c == ')' || c == 'x')){
-			std::cout << "Structure must only contain ._()x: " << c << std::endl;
-			exit(EXIT_FAILURE);
+            if (exit_on_invalid) {
+                std::cerr << "Error: Structure contains invalid character " << c << ". Allowed: ., _, (, ), x." << std::endl;
+                exit(EXIT_FAILURE);
+            }
+            return false;
 		}
 	}
+    return true;
 }
 
 //check if sequence is valid with regular expression
 //check length and if any characters other than GCAUT
-void validateSequence(std::string sequence){
-
+bool validateSequence(std::string& sequence, bool exit_on_invalid){ 
 	if(sequence.length() == 0){
-		std::cout << "sequence is missing" << std::endl;
-		exit(EXIT_FAILURE);
+        if (exit_on_invalid) {
+            std::cerr << "Error: Sequence is missing." << std::endl;
+            exit(EXIT_FAILURE);
+        }
+        return false;
 	}
+
   // return false if any characters other than GCAUT -- future implement check based on type
   for(char c : sequence) {
     if (!(c == 'G' || c == 'C' || c == 'A' || c == 'U' || c == 'T')) {
-		std::cout << "Sequence contains character " << c << " that is not G,C,A,U, or T." << std::endl;
-		exit(EXIT_FAILURE);
+        if (exit_on_invalid) {
+            std::cerr  << "Error: Sequence contains invalid character " << c << ". Allowed: G, C, A, U, T." << std::endl;
+            exit(EXIT_FAILURE);
+        }
+        return false;
     }
   }
+    return true;
 }
 
 std::string hfold(std::string seq,std::string res, double &energy, sparse_tree &tree, bool pk_free, bool pk_only, int dangle){

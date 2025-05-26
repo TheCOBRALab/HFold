@@ -62,6 +62,14 @@ TEST(SimpleHFold, Suboptimal){
     EXPECT_EQ(result[1].get_final_energy(), -0.33);
 }
 
+TEST(SimpleHFold, WeirdEdgeCase){
+    HFoldParams params;
+    params.sequence = "GGGGGGAAAAAGGGGGGAAAAGGGGGGCCCCCCAAAAAACCCCCCAAAAGGGGGGAAAAAACCCCCCAAAGGGAAACCCCCCCCC";
+    Result result = hfold_test(params)[0][0];
+    EXPECT_EQ(result.get_final_structure(), "[[[[[[.....[[[[[[....((((((]]]]]]......]]]]]]....((((((......))))))...((....)).))))))");
+    EXPECT_EQ(result.get_final_energy(), -30.99);
+}
+
 TEST(SimpleHFold, DanglesAndRestriction) {
     HFoldParams params;
     params.sequence = "GGGGGAAAAAAAGGGGGGGGGGAAAAAAAACCCCCAAAAAACCCCCCCCCC";
@@ -97,7 +105,7 @@ TEST(FileHFold, InputFileAndSequence) {
     std::string output = capture_console_output([&](){
         hfold_test(params);
     });
-
+    
     EXPECT_EQ(output , input_file_and_sequence_output);
 }
 
@@ -107,19 +115,8 @@ TEST(FileHFold, InputAndOutputFile) {
     params.fileO = "traceback_cases_out.txt";
     hfold_test(params);
     std::string output   = get_output(params.fileO);
-    std::string expected = get_output("expected_output/traceback_cases_expected.txt" );
+    std::string expected = get_output("expected_output/traceback_cases_expected.txt");
     EXPECT_EQ(output , expected);
 }
 
-
-/* FAILS ON MAC. WORKING ON FIX */
-// TEST(FileHFold, InputAndOutputFileWithSuboptimal) {
-//     HFoldParams params;
-//     params.fileI = "../../test/tests/input/traceback_cases.txt";
-//     params.fileO = "traceback_cases_subopt_out.txt";
-//     params.suboptCount = 3;
-//     hfold_test(params);
-//     std::string output   = get_output(params.fileO);
-//     std::string expected = get_output("../../test/tests/expected_output/traceback_cases_subopt_expected.txt" );
-//     EXPECT_EQ(output , expected);
-// }
+// TODO test suboptimal from file
