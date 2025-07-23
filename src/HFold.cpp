@@ -61,7 +61,7 @@ void validateSequence(std::string sequence){
 	}
   // return false if any characters other than GCAUT -- future implement check based on type
   for(char c : sequence) {
-    if (!(c == 'G' || c == 'C' || c == 'A' || c == 'U' || c == 'T')) {
+    if (!(c == 'G' || c == 'C' || c == 'A' || c == 'U' || c == 'T' || c == 'N')) {
 		std::cout << "Sequence contains character " << c << " that is not G,C,A,U, or T." << std::endl;
 		exit(EXIT_FAILURE);
     }
@@ -158,7 +158,6 @@ int main (int argc, char *argv[])
 	// Data structure for holding the output
 	std::vector<Result> result_list;
 
-    //double min_energy;
 	// Iterate through all hotspots or the single given input structure
 	cand_pos_t size = hotspot_list.size();
 	for(int i = 0;i<size;++i){
