@@ -204,11 +204,6 @@ energy_t W_final::E_ext_Stem(const energy_t& vij,const energy_t& vi1j,const ener
 void W_final::backtrack_restricted(seq_interval *cur_interval, sparse_tree &tree){
     char type;
 
-
-	// printf("type is %c and i is %d and j is %d\n",cur_interval->type,cur_interval->i,cur_interval->j);
-	//Hosna, March 8, 2012
-	// changing nested if to switch for optimality
-	// printf("At %c at %d and %d\n",cur_interval->type,cur_interval->i,cur_interval->j);
 	switch (cur_interval->type){
 		case LOOP:
 		{
@@ -231,14 +226,12 @@ void W_final::backtrack_restricted(seq_interval *cur_interval, sparse_tree &tree
 			// changing nested ifs to switch for optimality
 			switch (type){
 				case HAIRP:
-			//else if (type == HAIRP)
 				{
 					f[i].type = HAIRP;
 					f[j].type = HAIRP;
 				}
 					break;
 				case INTER:
-			//else if (type == INTER)
 				{
 					f[i].type = INTER;
 					f[j].type = INTER;
@@ -284,86 +277,79 @@ void W_final::backtrack_restricted(seq_interval *cur_interval, sparse_tree &tree
 					int best_k = -1, best_row = -1;
 					int tmp= INF, min = INF;
 					for (cand_pos_t k = i+1; k <= j-1; k++){
-						tmp = V->get_energy_WM (i+1,k-1) + std::min(V->get_energy_WMv(k, j-1),V->get_energy_WMp(k, j-1)) + E_MLstem(pair[S_[j]][S_[i]],-1,-1,params_) + params_->MLclosing;
-						if (tmp < min)
-						  {
+						
+						// Mateo Fix Jul 2025 Dangle 2 was not implemented in traceback here.
+						tmp = V->get_energy_WM (i+1,k-1) + std::min(V->get_energy_WMv(k, j-1),V->get_energy_WMp(k, j-1)) + params_->MLclosing;
+						if(params_->model_details.dangles == 2) tmp += E_MLstem(pair[S_[j]][S_[i]],S_[j-1],S_[i+1],params_);
+						else tmp+= E_MLstem(pair[S_[j]][S_[i]],-1,-1,params_);							
+						
+						if (tmp < min){
 							min = tmp;
 							best_k = k;
 							best_row = 1;
-						  }
-						  // TODO:
-						  // Hosna, May 1st, 2012
-						  // do I need to check for non-canonical base pairings here as well so the dangle values not be INF??
-						if (tree.tree[i+1].pair <= -1)
-						{
-							tmp = V->get_energy_WM (i+2,k-1) + std::min(V->get_energy_WMv(k, j-1),V->get_energy_WMp(k, j-1)) + E_MLstem(pair[S_[j]][S_[i]],-1,S_[i+1],params_) + params_->MLclosing + params_->MLbase;
-							if (tmp < min)
-							{
-								min = tmp;
-								best_k = k;
-								best_row = 2;
-							}
 						}
-						if (tree.tree[j-1].pair <= -1)
-						{
-							tmp = V->get_energy_WM (i+1,k-1) + std::min(V->get_energy_WMv(k, j-2),V->get_energy_WMp(k, j-2)) + E_MLstem(pair[S_[j]][S_[i]],S_[j-1],-1,params_) + params_->MLclosing + params_->MLbase;
-							if (tmp < min)
-							{
-								min = tmp;
-								best_k = k;
-								best_row = 3;
+						
+						if(params_->model_details.dangles  == 1){ // Mateo 2025 July -- Don't need to go through these unless in dangle 1
+							if (tree.tree[i+1].pair <= -1){
+								tmp = V->get_energy_WM (i+2,k-1) + std::min(V->get_energy_WMv(k, j-1),V->get_energy_WMp(k, j-1)) + E_MLstem(pair[S_[j]][S_[i]],-1,S_[i+1],params_) + params_->MLclosing + params_->MLbase;
+								
+								if (tmp < min){
+									min = tmp;
+									best_k = k;
+									best_row = 2;
+								}
 							}
-						}
-						if (tree.tree[i+1].pair <= -1 && tree.tree[j-1].pair <= -1)
-						{
-							tmp = V->get_energy_WM (i+2,k-1) + std::min(V->get_energy_WMv(k, j-2),V->get_energy_WMp(k, j-2)) + E_MLstem(pair[S_[j]][S_[i]],S_[j-1],S_[i+1],params_) + params_->MLclosing + 2*params_->MLbase;
-							
-							if (tmp < min)
-							{
-								min = tmp;
-								best_k = k;
-								best_row = 4;
+							if (tree.tree[j-1].pair <= -1){
+								tmp = V->get_energy_WM (i+1,k-1) + std::min(V->get_energy_WMv(k, j-2),V->get_energy_WMp(k, j-2)) + E_MLstem(pair[S_[j]][S_[i]],S_[j-1],-1,params_) + params_->MLclosing + params_->MLbase;
+								
+								if (tmp < min){
+									min = tmp;
+									best_k = k;
+									best_row = 3;
+								}
+							}
+							if (tree.tree[i+1].pair <= -1 && tree.tree[j-1].pair <= -1){
+								tmp = V->get_energy_WM (i+2,k-1) + std::min(V->get_energy_WMv(k, j-2),V->get_energy_WMp(k, j-2)) + E_MLstem(pair[S_[j]][S_[i]],S_[j-1],S_[i+1],params_) + params_->MLclosing + 2*params_->MLbase;
+								
+								if (tmp < min){
+									min = tmp;
+									best_k = k;
+									best_row = 4;
+								}
 							}
 						}
 
 						tmp = static_cast<energy_t>((k-i-1)*params_->MLbase + V->get_energy_WMp(k,j-1))+ E_MLstem(pair[S_[j]][S_[i]],-1,-1,params_) + params_->MLclosing;
-						if (tmp < min)
-						  {
+						if (tmp < min){
 							min = tmp;
 							best_k = k;
 							best_row = 5;
 						  }
-						  // TODO:
-						  // Hosna, May 1st, 2012
-						  // do I need to check for non-canonical base pairings here as well so the dangle values not be INF??
-						if (tree.tree[i+1].pair <= -1)
-						{
-							if((k-(i+1)-1) >=0) tmp = static_cast<energy_t>((k-(i+1)-1)*params_->MLbase) + V->get_energy_WMp(k,j-1) + E_MLstem(pair[S_[j]][S_[i]],-1,S_[i+1],params_) + params_->MLclosing + params_->MLbase;
-							if (tmp < min)
-							{
-								min = tmp;
-								best_k = k;
-								best_row = 6;
+						
+						if(params_->model_details.dangles  == 1){ // Mateo 2025 July -- Don't need to go through these unless in dangle 1
+							if (tree.tree[i+1].pair <= -1){
+								if((k-(i+1)-1) >=0) tmp = static_cast<energy_t>((k-(i+1)-1)*params_->MLbase) + V->get_energy_WMp(k,j-1) + E_MLstem(pair[S_[j]][S_[i]],-1,S_[i+1],params_) + params_->MLclosing + params_->MLbase;
+								if (tmp < min){
+									min = tmp;
+									best_k = k;
+									best_row = 6;
+								}
 							}
-						}
-						if (tree.tree[j-1].pair <= -1)
-						{
-							tmp = static_cast<energy_t>((k-i-1)*params_->MLbase) + V->get_energy_WMp(k,j-2) + E_MLstem(pair[S_[j]][S_[i]],S_[j-1],-1,params_) + params_->MLclosing + params_->MLbase;
-							if (tmp < min)
-							{
-								min = tmp;
-								best_k = k;
-								best_row = 7;
+							if (tree.tree[j-1].pair <= -1){
+								tmp = static_cast<energy_t>((k-i-1)*params_->MLbase) + V->get_energy_WMp(k,j-2) + E_MLstem(pair[S_[j]][S_[i]],S_[j-1],-1,params_) + params_->MLclosing + params_->MLbase;
+								if (tmp < min){
+									min = tmp;
+									best_k = k;
+									best_row = 7;
+								}
 							}
-						}
-						if (tree.tree[i+1].pair <= -1 && tree.tree[j-1].pair <= -1)
-						{
-							if((k-(i+1)-1) >=0) tmp = static_cast<energy_t>((k-(i+1)-1)*params_->MLbase) + V->get_energy_WMp(k,j-2) + E_MLstem(pair[S_[j]][S_[i]],S_[j-1],S_[i+1],params_) + params_->MLclosing + 2*params_->MLbase;
-							if (tmp < min)
-							{
-								min = tmp;
-								best_k = k;
-								best_row = 8;
+							if (tree.tree[i+1].pair <= -1 && tree.tree[j-1].pair <= -1){
+								if((k-(i+1)-1) >=0) tmp = static_cast<energy_t>((k-(i+1)-1)*params_->MLbase) + V->get_energy_WMp(k,j-2) + E_MLstem(pair[S_[j]][S_[i]],S_[j-1],S_[i+1],params_) + params_->MLclosing + 2*params_->MLbase;
+								if (tmp < min){
+									min = tmp;
+									best_k = k;
+									best_row = 8;
+								}
 							}
 						}						
 					  }
@@ -407,7 +393,7 @@ void W_final::backtrack_restricted(seq_interval *cur_interval, sparse_tree &tree
 			break;
 		case FREE:
 		{
-			int j = cur_interval->j;
+			cand_pos_t j = cur_interval->j;
 
 			if (j==1) return;
 
@@ -834,7 +820,7 @@ void expand_hotspot(s_energy_matrix *V, Hotspot &hotspot, int n){
 	energy_t dangle_penalty = vrna_E_ext_stem(tt, si1, sj1, V->params_);
 
 
-    double energy = V->get_energy(hotspot.get_left_outer_index(), hotspot.get_right_outer_index());
+    double energy = V->get_energy(hotspot.get_left_outer_index(),hotspot.get_right_outer_index());
 
     // printf("here and %d\n",energy);
     //printf("energy: %lf, AU_total: %d, dangle_top_total: %d, dangle_bot_total: %d\n",energy,non_gc_penalty,dangle_top_penalty,dangle_bot_penalty);
@@ -848,14 +834,14 @@ void expand_hotspot(s_energy_matrix *V, Hotspot &hotspot, int n){
 
 //Mateo 13 Sept 2023
 //look for every possible hairpin loop, and try to add a arc to form a larger stack with at least min_stack_size bases
-void get_hotspots(std::string seq, std::vector<Hotspot> &hotspot_list, int max_hotspot, vrna_param_s *params){
+void get_hotspots(std::string seq,std::vector<Hotspot> &hotspot_list,int max_hotspot, vrna_param_s *params){
     
 	int n = seq.length();
 	s_energy_matrix *V;
 	make_pair_matrix();
 	short *S_ = encode_sequence(seq.c_str(),0);
 	short *S1_ = encode_sequence(seq.c_str(),1);
-	V = new s_energy_matrix (seq, n, S_, S1_, params);
+	V = new s_energy_matrix (seq,n,S_,S1_,params);
     int min_bp_distance = 3;
     int min_stack_size = 3; //the hotspot must be a stack of size >= 3
     // Hotspot current_hotspot;
@@ -884,12 +870,12 @@ void get_hotspots(std::string seq, std::vector<Hotspot> &hotspot_list, int max_h
     }
 
     //make sure we only keep top 20 hotspot with lowest energy
-    std::sort(hotspot_list.begin(), hotspot_list.end(), compare_hotspot_ptr);
+    std::sort(hotspot_list.begin(), hotspot_list.end(),compare_hotspot_ptr);
     while((int) hotspot_list.size() > max_hotspot){
         hotspot_list.pop_back();
     }
-	
-    //if no hotspot found, add all . as restricted
+
+    //if no hotspot found, add all _ as restricted
     if((int) hotspot_list.size() == 0){
         Hotspot hotspot(1,n,n+1);
         hotspot.set_default_structure();
@@ -902,16 +888,6 @@ void get_hotspots(std::string seq, std::vector<Hotspot> &hotspot_list, int max_h
     return;
 }
 
-
 bool compare_hotspot_ptr(Hotspot &a, Hotspot &b) { 
-	if (a.get_energy() != b.get_energy())
-		return (a.get_energy() < b.get_energy());
-
-	// Tie-breaker: compare by structure
-	if (a.get_structure() != b.get_structure())
-		return (a.get_structure() < b.get_structure());
-	
-	// Final fallback
-	// If all else is equal, compare by energy again
     return (a.get_energy() < b.get_energy()); 
 }

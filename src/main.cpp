@@ -22,7 +22,7 @@ int main(int argc, char* argv[]) {
     int suboptCount        = a.subopt_given          ? suboptimal     : 1;
     bool pk_free           = a.pk_free_given;
     bool pk_only           = a.pk_only_given;
-    int dangles            = a.dangles_given         ? dangle_model   : 2;
+    int dangles            = a.dangles_given         ? dangle_model   : 1;
     std::string paramFile  = a.paramFile_given       ? parameter_file : "params/rna_DirksPierce09.par";
 
     std::vector<RNAEntry> inputs = get_all_inputs(fileI, sequence, restricted);

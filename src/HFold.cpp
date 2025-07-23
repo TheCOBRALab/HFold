@@ -174,9 +174,9 @@ bool validateSequence(std::string& sequence, bool exit_on_invalid){
 
   // return false if any characters other than GCAUT -- future implement check based on type
   for(char c : sequence) {
-    if (!(c == 'G' || c == 'C' || c == 'A' || c == 'U' || c == 'T')) {
+    if (!(c == 'G' || c == 'C' || c == 'A' || c == 'U' || c == 'T' || c == 'N')) {
         if (exit_on_invalid) {
-            std::cerr  << "Error: Sequence contains invalid character " << c << ". Allowed: G, C, A, U, T." << std::endl;
+            std::cerr  << "Error: Sequence contains invalid character " << c << ". Allowed: G, C, A, U, T, N." << std::endl;
             exit(EXIT_FAILURE);
         }
         return false;
