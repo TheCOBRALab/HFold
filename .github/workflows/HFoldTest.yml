@@ -28,14 +28,14 @@ jobs:
 
 # -------------------- ViennaRNA --------------------
     - name: Restore ViennaRNA from cache
-      id: cache-viennarna
-      uses: actions/cache@v4
+      id: restore-viennarna
+      uses: actions/cache/restore@v4
       with:
         path: ${{ env.VIENNARNA_PREFIX }}
         key: viennarna-${{ env.VIENNARNA_VERSION }}-${{ runner.os }}-${{ runner.arch }}
 
     - name: Build & install ViennaRNA
-      if: steps.cache-viennarna.outputs.cache-hit != 'true'
+      if: steps.restore-viennarna.outputs.cache-hit != 'true'
       run: |
         curl -L -O https://github.com/ViennaRNA/ViennaRNA/releases/download/v${VIENNARNA_VERSION}/ViennaRNA-${VIENNARNA_VERSION}.tar.gz
         tar -xzf ViennaRNA-${VIENNARNA_VERSION}.tar.gz
@@ -55,7 +55,18 @@ jobs:
         echo "CMAKE_PREFIX_PATH=${VIENNARNA_PREFIX}"                                          >>"$GITHUB_ENV"
         echo "LD_LIBRARY_PATH=${VIENNARNA_PREFIX}/lib:$LD_LIBRARY_PATH"                       >>"$GITHUB_ENV"
         echo "DYLD_FALLBACK_LIBRARY_PATH=${VIENNARNA_PREFIX}/lib:$DYLD_FALLBACK_LIBRARY_PATH" >>"$GITHUB_ENV"
-    
+
+    # -------------------------------------------------
+    # Important: save the cache **before** running tests,
+    # so it is preserved even if the tests fail.
+    # -------------------------------------------------
+    - name: Save ViennaRNA into cache
+      if: steps.restore-viennarna.outputs.cache-hit != 'true'   # only if we really built it
+      uses: actions/cache/save@v4                               # ⟵ save‑only action
+      with:
+        path: ${{ env.VIENNARNA_PREFIX }}
+        key: viennarna-${{ env.VIENNARNA_VERSION }}-${{ runner.os }}-${{ runner.arch }}
+
 # -------------------- Build --------------------
     - name: Set reusable strings
       id: strings
