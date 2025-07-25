@@ -889,5 +889,8 @@ void get_hotspots(std::string seq,std::vector<Hotspot> &hotspot_list,int max_hot
 }
 
 bool compare_hotspot_ptr(Hotspot &a, Hotspot &b) { 
-    return (a.get_energy() < b.get_energy()); 
+	if (a.get_energy() !=  b.get_energy()){
+		return a.get_energy() < b.get_energy();
+	}
+	return a.get_structure() < b.get_structure();
 }
