@@ -64,3 +64,5 @@ ViennaRNA-2.7.0.tar.gz
 test/Testing
 test/tests/Testing
 
+# MacOS
+.DS_Store

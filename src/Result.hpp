@@ -21,7 +21,9 @@ class Result{
 		bool operator ()(Result &x, Result &y) const {
 			if (x.get_final_energy() != y.get_final_energy())
                 return x.get_final_energy() < y.get_final_energy();
-            return x.get_restricted_energy() < y.get_restricted_energy();
+            if (x.get_restricted_energy() != y.get_restricted_energy())
+                return x.get_restricted_energy() < y.get_restricted_energy();
+            return (x.get_final_structure() < y.get_final_structure());
 		}
 		} result_comp;
         
