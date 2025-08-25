@@ -793,7 +793,6 @@ int distance(int left, int right){
 //Mateo 13 Sept 2023
 //given a initial hotspot which is a hairpin loop, keep trying to add a arc to form a larger stack
 void expand_hotspot(s_energy_matrix *V, Hotspot &hotspot, int n){
-    //printf("\nexpanding hotspot: i: %d j: %d\n",hotspot->get_left_inner_index(),hotspot->get_right_inner_index());
     //calculation for the hairpin that is already in there
     V->compute_hotspot_energy(hotspot.get_left_outer_index(),hotspot.get_right_outer_index(),0);
 
@@ -822,13 +821,9 @@ void expand_hotspot(s_energy_matrix *V, Hotspot &hotspot, int n){
 
     double energy = V->get_energy(hotspot.get_left_outer_index(),hotspot.get_right_outer_index());
 
-    // printf("here and %d\n",energy);
-    //printf("energy: %lf, AU_total: %d, dangle_top_total: %d, dangle_bot_total: %d\n",energy,non_gc_penalty,dangle_top_penalty,dangle_bot_penalty);
-
     energy = (energy + dangle_penalty) / 100;
 
     hotspot.set_energy(energy);
-    //printf("done: %d %d %d %d\n",hotspot->get_left_outer_index(),hotspot->get_left_inner_index(),hotspot->get_right_inner_index(),hotspot->get_right_outer_index());
     return;
 }
 
@@ -844,7 +839,6 @@ void get_hotspots(std::string seq,std::vector<Hotspot> &hotspot_list,int max_hot
 	V = new s_energy_matrix (seq,n,S_,S1_,params);
     int min_bp_distance = 3;
     int min_stack_size = 3; //the hotspot must be a stack of size >= 3
-    // Hotspot current_hotspot;
     //start at min_stack_size-1 and go outward to try to add more arcs to form bigger stack because we cannot expand more than min_stack_size from there anyway
     for(int i = min_stack_size; i <= n; i++){
         for(int j = i; j <= n; j++){
@@ -856,14 +850,11 @@ void get_hotspots(std::string seq,std::vector<Hotspot> &hotspot_list,int max_hot
 
                 expand_hotspot(V,current_hotspot,n);
 
-
                 if(current_hotspot.get_size() < min_stack_size || current_hotspot.is_invalid_energy()){
 
                 }else{
-                    
                     current_hotspot.set_structure();
                     hotspot_list.push_back(current_hotspot);
-
                 }
             }
         }
@@ -889,5 +880,8 @@ void get_hotspots(std::string seq,std::vector<Hotspot> &hotspot_list,int max_hot
 }
 
 bool compare_hotspot_ptr(Hotspot &a, Hotspot &b) { 
-    return (a.get_energy() < b.get_energy()); 
+    if (a.get_energy() !=  b.get_energy()){
+		return a.get_energy() < b.get_energy();
+	}
+	return a.get_structure() < b.get_structure();
 }
