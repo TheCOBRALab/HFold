@@ -364,7 +364,7 @@ void pseudo_loop::compute_WMBP(cand_pos_t i, cand_pos_t j, sparse_tree &tree){
 			cand_pos_t Bp_lj = tree.Bp(l,j);
 			// Mateo Jan 2025 Added exterior cases to consider when looking at band borders. Solved case of [.(.].[.).]
 			int ext_case = compute_exterior_cases(l,j,tree);
-			if((b_ij > 0 && l < b_ij) || ext_case == 0){
+			if((b_ij > 0 && l < b_ij) || (b_ij<0 && ext_case == 0)){
 				if (bp_il >= 0 && l>bp_il && Bp_lj > 0 && l<Bp_lj){ // bp(i,l) < l < Bp(l,j)
 					cand_pos_t B_lj = tree.B(l,j);
 
@@ -394,7 +394,7 @@ void pseudo_loop::compute_WMBP(cand_pos_t i, cand_pos_t j, sparse_tree &tree){
 			// the chosen l should be less than border_b(i,j) -- should be greater than border_b(i,l)
 			// Mateo Jan 2025 Added exterior cases to consider when looking at band borders. Solved case of [.(.].[.).]
 			int ext_case = compute_exterior_cases(l,j,tree);
-			if((b_ij > 0 && l < b_ij) || ext_case == 0){
+			if((b_ij > 0 && l < b_ij) || (b_ij<0 && ext_case == 0)){
 				if (bp_il >= 0 && l>bp_il && Bp_lj > 0 && l<Bp_lj){ // bp(i,l) < l < Bp(l,j)
 					cand_pos_t B_lj = tree.B(l,j);
 
@@ -763,7 +763,7 @@ void pseudo_loop::back_track(std::string structure, minimum_fold *f, seq_interva
 						cand_pos_t Bp_lj = tree.Bp(l,j);
 						// Mateo Jan 2025 Added exterior cases to consider when looking at band borders. Solved case of [.(.].[.).]
 						int ext_case = compute_exterior_cases(l,j,tree);
-						if ((b_ij > 0 && l < b_ij) || ext_case == 0){
+						if ((b_ij > 0 && l < b_ij) || (b_ij<0 && ext_case == 0)){
 							if (bp_il >= 0 && l>bp_il && Bp_lj > 0 && l<Bp_lj){ // bp(i,l) < l < Bp(l,j)
 		
 								cand_pos_t B_lj = tree.B(l,j);
@@ -795,7 +795,7 @@ void pseudo_loop::back_track(std::string structure, minimum_fold *f, seq_interva
 						cand_pos_t Bp_lj = tree.Bp(l,j);
 						// Mateo Jan 2025 Added exterior cases to consider when looking at band borders. Solved case of [.(.].[.).]
 						int ext_case = compute_exterior_cases(l,j,tree);
-						if((b_ij > 0 && l < b_ij) || ext_case == 0){
+						if((b_ij > 0 && l < b_ij) || (b_ij<0 && ext_case == 0)){
 							if (bp_il >= 0 && l>bp_il && Bp_lj > 0 && l<Bp_lj){ // bp(i,l) < l < Bp(l,j)
 		
 								cand_pos_t B_lj = tree.B(l,j);
