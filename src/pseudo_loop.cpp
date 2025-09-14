@@ -7,6 +7,8 @@
 #include <math.h>
 #include <algorithm>
 
+#define debug 0
+
 pseudo_loop::pseudo_loop(std::string seq, std::string res, s_energy_matrix *V, short *S, short *S1, vrna_param_t *params)
 {
 	this->seq = seq;
@@ -364,7 +366,7 @@ void pseudo_loop::compute_WMBP(cand_pos_t i, cand_pos_t j, sparse_tree &tree){
 			cand_pos_t Bp_lj = tree.Bp(l,j);
 			// Mateo Jan 2025 Added exterior cases to consider when looking at band borders. Solved case of [.(.].[.).]
 			int ext_case = compute_exterior_cases(l,j,tree);
-			if((b_ij > 0 && l < b_ij) || ext_case == 0){
+			if((b_ij > 0 && l < b_ij) || (b_ij<0 && ext_case == 0)){
 				if (bp_il >= 0 && l>bp_il && Bp_lj > 0 && l<Bp_lj){ // bp(i,l) < l < Bp(l,j)
 					cand_pos_t B_lj = tree.B(l,j);
 
@@ -394,7 +396,7 @@ void pseudo_loop::compute_WMBP(cand_pos_t i, cand_pos_t j, sparse_tree &tree){
 			// the chosen l should be less than border_b(i,j) -- should be greater than border_b(i,l)
 			// Mateo Jan 2025 Added exterior cases to consider when looking at band borders. Solved case of [.(.].[.).]
 			int ext_case = compute_exterior_cases(l,j,tree);
-			if((b_ij > 0 && l < b_ij) || ext_case == 0){
+			if((b_ij > 0 && l < b_ij) || (b_ij<0 && ext_case == 0)){
 				if (bp_il >= 0 && l>bp_il && Bp_lj > 0 && l<Bp_lj){ // bp(i,l) < l < Bp(l,j)
 					cand_pos_t B_lj = tree.B(l,j);
 
@@ -699,6 +701,7 @@ void pseudo_loop::back_track(std::string structure, minimum_fold *f, seq_interva
 					min = tmp;
 					best_row = 2;
 				}
+				if(debug) printf("In WMB, i is %d and j is %d and l is %d and min is %d\n",i,j,best_l,min);
 
 				switch (best_row)
 				{
@@ -742,6 +745,7 @@ void pseudo_loop::back_track(std::string structure, minimum_fold *f, seq_interva
 					insert_node(i,best_l,P_WMBP);
 					insert_node(best_l +1,j,P_WI);
 				}
+				if(debug) printf("In WMBW, i is %d and j is %d and l is %d and min is %d\n",i,j,best_l,min);
 			}
 				break;
 			case P_WMBP:
@@ -763,7 +767,7 @@ void pseudo_loop::back_track(std::string structure, minimum_fold *f, seq_interva
 						cand_pos_t Bp_lj = tree.Bp(l,j);
 						// Mateo Jan 2025 Added exterior cases to consider when looking at band borders. Solved case of [.(.].[.).]
 						int ext_case = compute_exterior_cases(l,j,tree);
-						if ((b_ij > 0 && l < b_ij) || ext_case == 0){
+						if ((b_ij > 0 && l < b_ij) || (b_ij<0 && ext_case == 0)){
 							if (bp_il >= 0 && l>bp_il && Bp_lj > 0 && l<Bp_lj){ // bp(i,l) < l < Bp(l,j)
 		
 								cand_pos_t B_lj = tree.B(l,j);
@@ -795,7 +799,7 @@ void pseudo_loop::back_track(std::string structure, minimum_fold *f, seq_interva
 						cand_pos_t Bp_lj = tree.Bp(l,j);
 						// Mateo Jan 2025 Added exterior cases to consider when looking at band borders. Solved case of [.(.].[.).]
 						int ext_case = compute_exterior_cases(l,j,tree);
-						if((b_ij > 0 && l < b_ij) || ext_case == 0){
+						if((b_ij > 0 && l < b_ij) || (b_ij<0 && ext_case == 0)){
 							if (bp_il >= 0 && l>bp_il && Bp_lj > 0 && l<Bp_lj){ // bp(i,l) < l < Bp(l,j)
 		
 								cand_pos_t B_lj = tree.B(l,j);
@@ -853,6 +857,8 @@ void pseudo_loop::back_track(std::string structure, minimum_fold *f, seq_interva
 						best_row = 4;
 						best_l = l1;
 					}
+
+					if(debug) printf("In WMBP, i is %d and j is %d and l is %d and min is %d\n",i,j,best_l,min);
 				}
 
 				switch (best_row)
@@ -1026,7 +1032,8 @@ void pseudo_loop::back_track(std::string structure, minimum_fold *f, seq_interva
 					}
 					
 				}
-
+				
+				if(debug) printf("In VP, i is %d and j is %d and ip is %d and jp is %d and min is %d\n",i,j,best_ip,best_jp,min);
 				switch (best_row)
 				{
 					case 1:
@@ -1119,7 +1126,8 @@ void pseudo_loop::back_track(std::string structure, minimum_fold *f, seq_interva
 						min = tmp;
 					}
 				}
-
+				
+				if(debug) printf("In VPL, i is %d and j is %d and k is %d and min is %d\n",i,j,best_k,min);
 				if (best_k != -1){
 					insert_node(best_k,j,P_VP);
 				}
@@ -1157,7 +1165,8 @@ void pseudo_loop::back_track(std::string structure, minimum_fold *f, seq_interva
 						min = tmp;
 					}
 				}
-
+				
+				if(debug) printf("In VPR, i is %d and j is %d and k is %d and min is %d\n",i,j,best_k,min);
 				switch (best_row)
 				{
 					case 1:
@@ -1225,7 +1234,8 @@ void pseudo_loop::back_track(std::string structure, minimum_fold *f, seq_interva
 						min = tmp;
 						best_row = 5;
 					}
-				}  
+				}
+				if(debug) printf("In WI, i is %d and j is %d and k is %d and min is %d\n",i,j,best_t,min);  
 			
 			switch (best_row)
 			{
@@ -1303,59 +1313,60 @@ void pseudo_loop::back_track(std::string structure, minimum_fold *f, seq_interva
 			}
 			for (cand_pos_t l = i+1; l<= ip ; l++){
 				if (tree.tree[l].pair >= 0 && jp <= tree.tree[l].pair && tree.tree[l].pair < j){
-				cand_pos_t lp = tree.tree[l].pair;
+					cand_pos_t lp = tree.tree[l].pair;
 
-				bool empty_region_il = (tree.up[(l)-1] >= l-i-1); //empty between i+1 and lp-1
-				bool empty_region_lpj = (tree.up[(j)-1] >= j-lp-1); // empty between l+1 and ip-1
-				bool weakly_closed_il = tree.weakly_closed(i+1,l-1); // weakly closed between i+1 and lp-1
-				bool weakly_closed_lpj = tree.weakly_closed(lp+1,j-1); // weakly closed between l+1 and ip-1
+					bool empty_region_il = (tree.up[(l)-1] >= l-i-1); //empty between i+1 and lp-1
+					bool empty_region_lpj = (tree.up[(j)-1] >= j-lp-1); // empty between l+1 and ip-1
+					bool weakly_closed_il = tree.weakly_closed(i+1,l-1); // weakly closed between i+1 and lp-1
+					bool weakly_closed_lpj = tree.weakly_closed(lp+1,j-1); // weakly closed between l+1 and ip-1
 
-				if (empty_region_il && empty_region_lpj){
-					tmp = get_e_intP(i,l,lp,j)+ get_BE(l,lp,ip,jp,tree);
-					if (min > tmp){
-						min = tmp;
-						best_row = 2;
-						best_l = l;
+					if (empty_region_il && empty_region_lpj){
+						tmp = get_e_intP(i,l,lp,j)+ get_BE(l,lp,ip,jp,tree);
+						if (min > tmp){
+							min = tmp;
+							best_row = 2;
+							best_l = l;
+						}
 					}
-				}
 
-				// case 3
-				if (weakly_closed_il && weakly_closed_lpj){
-					tmp = get_WIP(i+1,l-1) + get_BE(l,lp,ip,jp,tree) + get_WIP(lp+1,j-1);
-					if (min > tmp){
-						min = tmp;
-						best_row = 3;
-						best_l = l;
+					// case 3
+					if (weakly_closed_il && weakly_closed_lpj){
+						tmp = get_WIP(i+1,l-1) + get_BE(l,lp,ip,jp,tree) + get_WIP(lp+1,j-1);
+						if (min > tmp){
+							min = tmp;
+							best_row = 3;
+							best_l = l;
+						}
 					}
-				}
 
-				// case 4
-				if (weakly_closed_il && empty_region_lpj){
-					// Hosna: July 5th, 2007
-					// After meeting with Anne and Cristina --> ap should have 2* bp to consider the biggest and the one that crosses
-					// in a multiloop that spans a band
-					tmp = get_WIP(i+1,l-1) + get_BE(l,lp,ip,jp,tree) + c_penalty * (j-lp-1) + ap_penalty + 2* bp_penalty;
-					if (min > tmp){
-						min = tmp;
-						best_row = 4;
-						best_l = l;
+					// case 4
+					if (weakly_closed_il && empty_region_lpj){
+						// Hosna: July 5th, 2007
+						// After meeting with Anne and Cristina --> ap should have 2* bp to consider the biggest and the one that crosses
+						// in a multiloop that spans a band
+						tmp = get_WIP(i+1,l-1) + get_BE(l,lp,ip,jp,tree) + c_penalty * (j-lp-1) + ap_penalty + 2* bp_penalty;
+						if (min > tmp){
+							min = tmp;
+							best_row = 4;
+							best_l = l;
+						}
 					}
-				}
 
-				// case 5
-				if (empty_region_il && weakly_closed_lpj){
-					// Hosna: July 5th, 2007
-					// After meeting with Anne and Cristina --> ap should have 2* bp to consider the biggest and the one that crosses
-					// in a multiloop that spans a band
-					tmp = ap_penalty + 2* bp_penalty+ c_penalty * (l-i-1) + get_BE(l,lp,ip,jp,tree) + get_WIP(lp+1,j-1);
-					if (min > tmp){
-						min = tmp;
-						best_row = 5;
-						best_l = l;
+					// case 5
+					if (empty_region_il && weakly_closed_lpj){
+						// Hosna: July 5th, 2007
+						// After meeting with Anne and Cristina --> ap should have 2* bp to consider the biggest and the one that crosses
+						// in a multiloop that spans a band
+						tmp = ap_penalty + 2* bp_penalty+ c_penalty * (l-i-1) + get_BE(l,lp,ip,jp,tree) + get_WIP(lp+1,j-1);
+						if (min > tmp){
+							min = tmp;
+							best_row = 5;
+							best_l = l;
+						}
 					}
-				}
 				}
 			}
+			if(debug) printf("In BE, i is %d and j is %d and ip is %d and jp is %d and l is %d and min is %d\n",i,j,ip,jp,best_l,min);
 			switch(best_row)
 			{
 				case 1:
@@ -1472,6 +1483,7 @@ void pseudo_loop::back_track(std::string structure, minimum_fold *f, seq_interva
 				}
 			}
 
+			if(debug) printf("In WIP, i is %d and j is %d and k is %d and min is %d\n",i,j,best_k,min);
 			switch(best_row)
 			{
 				case 1:
