@@ -37,14 +37,16 @@ jobs:
     - name: Build & install ViennaRNA
       if: steps.restore-viennarna.outputs.cache-hit != 'true'
       run: |
+        set -euxo pipefail
         curl -L -O https://github.com/ViennaRNA/ViennaRNA/releases/download/v${VIENNARNA_VERSION}/ViennaRNA-${VIENNARNA_VERSION}.tar.gz
         tar -xzf ViennaRNA-${VIENNARNA_VERSION}.tar.gz
         cd ViennaRNA-${VIENNARNA_VERSION}
+        sed -i.bak 's/::template go(/::template go<>(/' src/dlib-19.24/dlib/global_optimization/find_max_global.h
         ./configure --without-perl --prefix="${VIENNARNA_PREFIX}"
         CORES=$(nproc 2>/dev/null || sysctl -n hw.ncpu)
         make -j"$CORES"
         make install -j"$CORES"
-
+        
     # Expose headers & libs to the compiler / linker / CMake
     - name: Export ViennaRNA paths
       shell: bash
