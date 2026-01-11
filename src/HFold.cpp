@@ -43,7 +43,7 @@ void validateStructure(std::string &seq, std::string &structure) {
         if (structure[j] == '(') pairs.push_back(j);
         if (structure[j] == ')') {
             if (pairs.empty()) {
-                std::cerr << "Error: Incorrect input: More left parentheses than right" << std::endl;
+                std::cerr << "Error: Incorrect input: More right parentheses than left" << std::endl;
                 exit(EXIT_FAILURE);
             } else {
                 int i = pairs.back();
