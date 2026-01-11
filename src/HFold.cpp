@@ -147,7 +147,7 @@ bool validateStructure(std::string &seq, std::string &structure, bool exit_on_in
         if (structure[j] == ')') {
             if (pairs.empty()) {
                 if (exit_on_invalid) {
-                    std::cerr << "Error: Incorrect input: More left parentheses than right" << std::endl;
+                    std::cerr << "Error: Incorrect input: More right parentheses than left" << std::endl;
                     exit(EXIT_FAILURE);
                 }
                 return false;
