@@ -20,7 +20,7 @@ bool exists (const std::string path) {
 
 void get_input(std::string file, std::string &sequence, std::string &structure){
 	if(!exists(file)){
-		std::cout << "Input file does not exist" << std::endl;
+		std::cerr << "Error: Input file does not exist" << std::endl;
 		exit(EXIT_FAILURE);
 	}
 	std::ifstream in(file.c_str());
@@ -35,20 +35,34 @@ void get_input(std::string file, std::string &sequence, std::string &structure){
 	in.close();
 }
 
-//check length and if any characters other than ._()
-void validateStructure(std::string sequence, std::string structure){
-	if(structure.length() != sequence.length()){
-		std::cout << " The length of the sequence and corresponding structure must have the same length" << std::endl;
-		exit(EXIT_FAILURE);
-	}
-
-	//check if any characters are not ._()
-	for(char c : structure) {
-		if (!(c == '.' || c == '_' || c == '(' || c == ')' || c == 'x')){
-			std::cout << "Structure must only contain ._()x: " << c << std::endl;
-			exit(EXIT_FAILURE);
-		}
-	}
+//check length and if any characters other than ._() and if the base pairs are valid
+void validateStructure(std::string &seq, std::string &structure) {
+    int n = structure.length();
+    std::vector<int> pairs;
+    for (int j = 0; j < n; ++j) {
+        if (structure[j] == '(') pairs.push_back(j);
+        if (structure[j] == ')') {
+            if (pairs.empty()) {
+                std::cerr << "Error: Incorrect input: More left parentheses than right" << std::endl;
+                exit(EXIT_FAILURE);
+            } else {
+                int i = pairs.back();
+                pairs.pop_back();
+                if (seq[i] == 'A' && seq[j] == 'U') {
+                } else if (seq[i] == 'C' && seq[j] == 'G') {
+                } else if ((seq[i] == 'G' && seq[j] == 'C') || (seq[i] == 'G' && seq[j] == 'U')) {
+                } else if ((seq[i] == 'U' && seq[j] == 'G') || (seq[i] == 'U' && seq[j] == 'A')) {
+                } else {
+                    std::cerr << "Error: Incorrect input: " << seq[i] << " does not pair with " << seq[j] << std::endl;
+                    exit(EXIT_FAILURE);
+                }
+            }
+        }
+    }
+    if (!pairs.empty()) {
+        std::cerr << "Error: Incorrect input: More left parentheses than right" << std::endl;
+        exit(EXIT_FAILURE);
+    }
 }
 
 //check if sequence is valid with regular expression
@@ -56,13 +70,13 @@ void validateStructure(std::string sequence, std::string structure){
 void validateSequence(std::string sequence){
 
 	if(sequence.length() == 0){
-		std::cout << "sequence is missing" << std::endl;
+		std::cerr << "sequence is missing" << std::endl;
 		exit(EXIT_FAILURE);
 	}
   // return false if any characters other than GCAUT -- future implement check based on type
   for(char c : sequence) {
     if (!(c == 'G' || c == 'C' || c == 'A' || c == 'U' || c == 'T' || c == 'N')) {
-		std::cout << "Sequence contains character " << c << " that is not G,C,A,U, or T." << std::endl;
+		std::cerr << "Sequence contains character " << c << " that is not N, G ,C ,A ,U , or T." << std::endl;
 		exit(EXIT_FAILURE);
     }
   }
