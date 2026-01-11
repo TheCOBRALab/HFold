@@ -138,26 +138,43 @@ std::vector<RNAEntry> get_all_inputs(const std::string& fileI, const std::string
     return entries;
 }
 
-//check length and if any characters other than ._()
-bool validateStructure(std::string& sequence, std::string& structure, bool exit_on_invalid){
-	if(structure.length() != sequence.length()){
+// check length and if any characters other than ._() and if the base pairs are valid
+bool validateStructure(std::string &seq, std::string &structure, bool exit_on_invalid) {
+    cand_pos_t n = structure.length();
+    std::vector<int> pairs;
+    for (int j = 0; j < n; ++j) {
+        if (structure[j] == '(') pairs.push_back(j);
+        if (structure[j] == ')') {
+            if (pairs.empty()) {
+                if (exit_on_invalid) {
+                    std::cerr << "Error: Incorrect input: More left parentheses than right" << std::endl;
+                    exit(EXIT_FAILURE);
+                }
+                return false;
+            } else {
+                cand_pos_t i = pairs.back();
+                pairs.pop_back();
+                if (seq[i] == 'A' && seq[j] == 'U') {
+                } else if (seq[i] == 'C' && seq[j] == 'G') {
+                } else if ((seq[i] == 'G' && seq[j] == 'C') || (seq[i] == 'G' && seq[j] == 'U')) {
+                } else if ((seq[i] == 'U' && seq[j] == 'G') || (seq[i] == 'U' && seq[j] == 'A')) {
+                } else {
+                    if (exit_on_invalid) {
+                        std::cerr << "Error: Incorrect input: " << seq[i] << " does not pair with " << seq[j] << std::endl;
+                        exit(EXIT_FAILURE);
+                    }
+                    return false;
+                }
+            }
+        }
+    }
+    if (!pairs.empty()) {
         if (exit_on_invalid) {
-            std::cerr << "Error: The length of the sequence and structure must be the same." << std::endl;
+            std::cerr << "Error: Incorrect input: More left parentheses than right" << std::endl;
             exit(EXIT_FAILURE);
         }
         return false;
-	}
-
-	//check if any characters are not ._()
-	for(char c : structure) {
-		if (!(c == '.' || c == '_' || c == '(' || c == ')' || c == 'x')){
-            if (exit_on_invalid) {
-                std::cerr << "Error: Structure contains invalid character " << c << ". Allowed: ., _, (, ), x." << std::endl;
-                exit(EXIT_FAILURE);
-            }
-            return false;
-		}
-	}
+    }
     return true;
 }
 
