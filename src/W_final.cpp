@@ -566,8 +566,8 @@ void W_final::backtrack_restricted(seq_interval *cur_interval, sparse_tree &tree
 				case 2:
 					//printf("W(%d) case 2: inserting Loop(%d,%d) and Free (0,%d)\n",j,best_i+1,j,best_i);
 					insert_node (best_i+1, j, LOOP);
-					if (best_i >= 1)// Hosna, March 26, 2012, was best_i-1 instead of best_i
-						insert_node (1, best_i, FREE);
+					if (best_i-1 >= 1)// Hosna, March 26, 2012, was best_i-1 instead of best_i //As is should be because acc is always W[i-1] - Mateo
+						insert_node (1, best_i-1, FREE);
 					break;
 				case 3:
 					//printf("W(%d) case 3: inserting Loop(%d,%d) and Free (0,%d)\n",j,best_i,j-1,best_i-1);
@@ -578,8 +578,8 @@ void W_final::backtrack_restricted(seq_interval *cur_interval, sparse_tree &tree
 				case 4:
 					//printf("W(%d) case 4: inserting Loop(%d,%d) and Free (0,%d)\n",j,best_i+1,j-1,best_i);
 					insert_node (best_i+1, j-1, LOOP);
-					if (best_i >= 1) // Hosna, March 26, 2012, was best_i-1 instead of best_i
-						insert_node (1, best_i, FREE);
+					if (best_i-1 >= 1) // Hosna, March 26, 2012, was best_i-1 instead of best_i //As is should be because acc is always W[i-1] - Mateo
+						insert_node (1, best_i-1, FREE);
 					break;
 				// Hosna: June 28, 2007
 				// the last branch of W, which is WMB_i,j
