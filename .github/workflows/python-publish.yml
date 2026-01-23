@@ -6,7 +6,7 @@ on:
     types: [published]
 
 env:
-  VIENNARNA_VERSION: "2.7.0"
+  VIENNARNA_VERSION: "2.7.1"
   VIENNARNA_PREFIX: "${{ github.workspace }}/viennarna"
 
 permissions:

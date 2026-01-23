@@ -6,18 +6,18 @@ HFold needs a 64bit Linux or macOS operating system to run
 
 ### Software Requirements:
 - CMake 3.15 or greater
-- ViennaRNA 2.7.0
+- ViennaRNA 2.7.1
 
 ### ViennaRNA package installation
 You will need to install ViennaRNA package in order to compile HFold
 
-1. Download the ViennaRNA package from [ViennaRNA-2.7.0.tar.gz](https://github.com/ViennaRNA/ViennaRNA/releases/download/v2.7.0/ViennaRNA-2.7.0.tar.gz)
+1. Download the ViennaRNA package from [ViennaRNA-2.7.1.tar.gz](https://github.com/ViennaRNA/ViennaRNA/releases/download/v2.7.1/ViennaRNA-2.7.1.tar.gz)
 
 
 2. Install the ViennaRNA package:
 ```
-tar -zxvf ViennaRNA-2.7.0.tar.gz
-cd ViennaRNA-2.7.0
+tar -zxvf ViennaRNA-2.7.1.tar.gz
+cd ViennaRNA-2.7.1
 ./configure --without-perl
 sudo make -j$(nproc)              # Linux
 sudo make -j$(sysctl -n hw.ncpu)  # macOS

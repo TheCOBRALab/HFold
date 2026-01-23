@@ -52,8 +52,8 @@ _skbuild/
 cd ..
 dist/
 *.pyc
-ViennaRNA-2.7.0/
-ViennaRNA-2.7.0.tar.gz
+ViennaRNA-2.7.1/
+ViennaRNA-2.7.1.tar.gz
 
 # Makefiles and tests
 /CMakeFiles/

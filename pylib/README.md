@@ -4,13 +4,13 @@
 ### ViennaRNA package installation
 The `hfold` package requires ViennaRNA to be installed before compilation.
 
-1. Download the ViennaRNA package: [ViennaRNA-2.7.0.tar.gz](https://github.com/ViennaRNA/ViennaRNA/releases/download/v2.7.0/ViennaRNA-2.7.0.tar.gz)
+1. Download the ViennaRNA package: [ViennaRNA-2.7.1.tar.gz](https://github.com/ViennaRNA/ViennaRNA/releases/download/v2.7.1/ViennaRNA-2.7.1.tar.gz)
 
 
 2. Install the Package:
 ```bash
-tar -zxvf ViennaRNA-2.7.0.tar.gz
-cd ViennaRNA-2.7.0
+tar -zxvf ViennaRNA-2.7.1.tar.gz
+cd ViennaRNA-2.7.1
 ./configure --without-perl
 sudo make -j$(nproc)              # Linux
 sudo make -j$(sysctl -n hw.ncpu)  # macOS
