@@ -241,15 +241,23 @@ void preprocess_sequence(std::string& seq, std::string& restricted, bool noConv)
     if (!restricted.empty()) validateStructure(seq, restricted);
 }
 
-void load_energy_parameters(const std::string& paramFile, const std::string& seq) {
+void load_energy_parameters(const std::string& paramFile, const std::string& seq, bool param_given) {
     if (paramFile.empty()) return; // No parameter file provided
     
-    if (file_exists(paramFile)) {
-        vrna_params_load(paramFile.c_str(), VRNA_PARAMETER_FORMAT_DEFAULT);
-    } else if (seq.find('T') != std::string::npos) { // if T is present, load DNA parameters
-        vrna_params_load_DNA_Mathews2004();
-    } else {
-        std::cerr << "Error: Input file not found: " << paramFile << std::endl;
+    if(param_given){
+        if (file_exists(paramFile)) {
+            vrna_params_load(paramFile.c_str(), VRNA_PARAMETER_FORMAT_DEFAULT);
+        } else {
+            std::cerr << "Error: Input file not found: " << paramFile << std::endl;
+        }
+    } else{
+        if (seq.find('T') != std::string::npos) {
+            vrna_params_load_DNA_Mathews2004();
+        } else if (file_exists(paramFile)){
+            vrna_params_load(paramFile.c_str(), VRNA_PARAMETER_FORMAT_DEFAULT);
+        } else{
+            std::cerr << "Error: Input file not found: " << paramFile << std::endl;
+        }
     }
 }
 

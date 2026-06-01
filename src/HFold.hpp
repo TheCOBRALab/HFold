@@ -28,7 +28,7 @@ bool validateSequence(std::string& sequence, bool exit_on_invalid = true);
 void seqtoRNA(std::string &seq);
 std::string hfold(std::string seq, std::string res, double &energy, sparse_tree &tree, bool pk_free, bool pk_only, int dangles);
 void preprocess_sequence(std::string& seq, std::string& restricted, bool noConv);
-void load_energy_parameters(const std::string& paramFile, const std::string& seq);
+void load_energy_parameters(const std::string& paramFile, const std::string& seq, bool param_given);
 std::vector<Hotspot> build_hotspots(const std::string& seq, const std::string& restricted, int suboptCount);
 std::vector<Result> fold_hotspots(
     const std::string& seq, 
