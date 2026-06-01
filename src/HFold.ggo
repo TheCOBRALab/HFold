@@ -1,0 +1,49 @@
+package "HFold"
+version "2.0"
+args "--unamed-opts=input"
+
+purpose "Possibly pseudoknotted minimum free energy folding of RNAs"
+
+usage "HFold [options] [sequence]"
+
+description "Read RNA sequence from stdin or cmdline; predict minimum\nfree energy and optimum structure using the possibly pseuodknotted\nMFE RNA folding algorithm of Jabbari and Condon, 2014."
+
+# Options
+
+option "input-structure" r
+    "Give a restricted structure as an input structure"
+    string optional
+
+option "input-file" i
+    "Give a path to an input file containing the sequence (and input structure if known)"
+    string optional
+
+option "output-file" o
+    "Give a path to an output file which will the sequence, and its structure and energy"
+    string optional
+
+option "opt" n
+    "Specify the number of suboptimal structures to output (default is 1)"
+    int default="1" optional
+
+option "pk-free" p
+    "Specify whether you only want the pseudoknot-free structure to be calculated"
+    flag off
+
+option "pk-only" k
+    "Only add base pairs which cross the constraint structure. The constraint structure is returned if there are no energetically favorable crossing base pairs"
+    flag off
+
+option "dangles" d
+    "Specify the dangle model to be used (base is 2)"
+    int default="2" optional
+
+option "paramFile" P
+    "Read energy parameters from paramfile, instead of using the default parameter set."
+    string optional
+
+option "noConv" -
+    "Do not convert DNA into RNA. This will use the Matthews 2004 parameters for DNA"
+    flag off
+
+text "\nThe input sequence is read from standard input, unless it is\ngiven on the command line.\n"

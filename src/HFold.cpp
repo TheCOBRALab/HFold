@@ -112,22 +112,13 @@ int main (int argc, char *argv[])
 		if(!args_info.input_file_given) std::getline(std::cin,seq);
 	}
 
-	std::string restricted;
-    args_info.input_structure_given ? restricted = input_struct : restricted = "";
+	std::string restricted = args_info.input_structure_given ? args_info.input_structure_arg : "";
 
-	std::string fileI;
-    args_info.input_file_given ? fileI = input_file : fileI = "";
+	std::string fileI = args_info.input_file_given ? args_info.input_file_arg : "";
 
-	std::string fileO;
-    args_info.output_file_given ? fileO = output_file : fileO = "";	
+	std::string fileO = args_info.output_file_given ? args_info.output_file_arg : "";	
 
-	int number_of_suboptimal_structure = args_info.subopt_given ? subopt : 1;
-
-	bool pk_free = args_info.pk_free_given;
-
-	bool pk_only = args_info.pk_only_given;
-
-	int dangles = args_info.dangles_given ? dangle_model : 1;
+	int number_of_suboptimal_structure = args_info.opt_given ? args_info.opt_arg : 1;
 
 	if(fileI != ""){
 		
@@ -141,18 +132,30 @@ int main (int argc, char *argv[])
 	}
 	int n = seq.length();
 	std::transform(seq.begin(), seq.end(), seq.begin(), ::toupper);
-	if(!args_info.noConv_given) seqtoRNA(seq);
+	if(!args_info.noConv_flag) seqtoRNA(seq);
 
 	validateSequence(seq);
 	if(restricted != "") validateStructure(seq,restricted);
 
-	std::string file= args_info.paramFile_given ? parameter_file : "params/rna_DirksPierce09.par";
-	if(exists(file)){
-		vrna_params_load(file.c_str(), VRNA_PARAMETER_FORMAT_DEFAULT);
-	}
-	else if (seq.find('T') != std::string::npos){
-		vrna_params_load_DNA_Mathews2004();
-	}
+	if(args_info.paramFile_given){
+        std::string file = args_info.paramFile_arg;
+        if (exists(file)) vrna_params_load(file.c_str(), VRNA_PARAMETER_FORMAT_DEFAULT);
+        else{
+            std::cerr << "Not a valid parameter file!" << std::endl;
+            exit(EXIT_FAILURE);
+        }
+    } else {
+        if (seq.find('T') != std::string::npos) {
+            vrna_params_load_DNA_Mathews2004();
+        } else{
+            std::string file = "params/rna_DirksPierce09.par";
+            if (exists(file)) vrna_params_load(file.c_str(), VRNA_PARAMETER_FORMAT_DEFAULT);
+            else{
+                std::cerr << "Not a valid parameter file!" << std::endl;
+                exit(EXIT_FAILURE);
+            }
+        }
+    }
 
 	std::vector<Hotspot> hotspot_list;
 
@@ -174,12 +177,12 @@ int main (int argc, char *argv[])
 
 	// Iterate through all hotspots or the single given input structure
 	cand_pos_t size = hotspot_list.size();
-	for(int i = 0;i<size;++i){
+	for(cand_pos_t i = 0;i<size;++i){
 		double energy;
 		std::string structure = hotspot_list[i].get_structure();
 
 		sparse_tree tree(structure,n);
-		std::string final_structure = hfold(seq,structure, energy,tree,pk_free,pk_only, dangles);
+		std::string final_structure = hfold(seq,structure, energy,tree,args_info.pk_free_flag,args_info.pk_only_flag, args_info.dangles_arg);
 		
 		Result result(seq,hotspot_list[i].get_structure(),hotspot_list[i].get_energy(),final_structure,energy);
 		result_list.push_back(result);
