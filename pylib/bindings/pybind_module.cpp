@@ -41,7 +41,7 @@ namespace bindings
 
         for (RNAEntry& current: inputs) {
             preprocess_sequence(current.sequence, current.structure, noConv_given);
-            load_energy_parameters(param_file, current.sequence);
+            load_energy_parameters(param_file, current.sequence, false);
             std::vector<Hotspot> hotspots = build_hotspots(current.sequence, current.structure, suboptCount);
             std::vector<Result> results = fold_hotspots(current.sequence, hotspots, pk_free, pk_only, dangles, input_structure_given);
             if (!suppress_output) {

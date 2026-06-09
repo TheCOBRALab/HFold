@@ -32,7 +32,7 @@ For more details about ViennaRNA, see https://github.com/ViennaRNA/ViennaRNA
 ### CMake installation
 
 
-[CMake](https://cmake.org/install/) version 3.9 or greater must be installed in a way that HFold can find it.    
+[CMake](https://cmake.org/install/) version 3.15 or greater must be installed in a way that HFold can find it.    
 
 To check if your system already has CMake, run this in terminal:     
 ```

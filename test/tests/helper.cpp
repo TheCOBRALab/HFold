@@ -63,7 +63,7 @@ std::vector<std::vector<Result>> hfold_test(HFoldParams& p) {
     std::vector<std::vector<Result>> all_results;
     for (RNAEntry& current : inputs){
         preprocess_sequence(current.sequence, current.structure, p.noConv_given);
-        load_energy_parameters(p.paramFile, current.sequence);
+        load_energy_parameters(p.paramFile, current.sequence, true);
 
         std::vector<Hotspot> hotspots = build_hotspots(
             current.sequence,
