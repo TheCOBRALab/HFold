@@ -148,7 +148,7 @@ int main (int argc, char *argv[])
         if (seq.find('T') != std::string::npos) {
             vrna_params_load_DNA_Mathews2004();
         } else{
-            std::string file = "params/rna_DirksPierce09.par";
+            std::string file = std::string(PARAMS_DIR) + "/rna_DirksPierce09.par";
             if (exists(file)) vrna_params_load(file.c_str(), VRNA_PARAMETER_FORMAT_DEFAULT);
             else{
                 std::cerr << "Not a valid parameter file!" << std::endl;
