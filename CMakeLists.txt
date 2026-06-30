@@ -11,6 +11,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 option(ENABLE_TESTS "Build unit tests" ON)
 option(BUILD_PYTHON "Build Python bindings using pybind11" OFF)
 
+# Directory for parameters
+set(PARAMS_DIR "${CMAKE_SOURCE_DIR}/params")  # or CMAKE_INSTALL_PREFIX based path
+
 if (NOT ENABLE_TESTS)
     message(STATUS "Unit tests are disabled. To enable them, set -DBUILD_TESTING=ON")
 elseif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test/googletest/CMakeLists.txt")
@@ -167,6 +170,10 @@ target_sources(HFold PRIVATE ${hfold_sources}) # Re-add for Conda packaging (doe
 target_include_directories(HFold SYSTEM PRIVATE ${VIENNARNA_INCLUDE_DIRECTORY}) 
 target_link_libraries(HFold PRIVATE HFoldLib)
 target_compile_options(HFold PRIVATE ${COMMON_COMPILE_OPTIONS})
+# Pass it as a compile definition
+target_compile_definitions(HFold PRIVATE 
+    PARAMS_DIR="${PARAMS_DIR}"
+)
 
 # Install rule (For Conda Packaging)
 install(TARGETS HFold RUNTIME DESTINATION bin)

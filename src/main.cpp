@@ -23,7 +23,7 @@ int main(int argc, char* argv[]) {
     bool pk_free           = a.pk_free_given;
     bool pk_only           = a.pk_only_given;
     int dangles            = a.dangles_given         ? a.dangles_arg           : 1;
-    std::string paramFile  = a.paramFile_given       ? a.paramFile_arg         : "params/rna_DirksPierce09.par";
+    std::string paramFile  = a.paramFile_given       ? a.paramFile_arg         : std::string(PARAMS_DIR) + "/rna_DirksPierce09.par";
 
     std::vector<RNAEntry> inputs = get_all_inputs(fileI, sequence, restricted);
 
