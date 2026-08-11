@@ -6,9 +6,8 @@
 #include <iostream>
 #include <functional>
 
-#include <HFold.hpp>
-#include <W_final.hpp>
-#include "helper.hpp"
+#include <HFold.hh>
+#include "helper.hh"
 
 TEST(SimpleHFold, ZeroSequence){
     HFoldParams params;

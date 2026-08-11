@@ -67,16 +67,16 @@
 #define PACKAGE_NAME "HFold"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "HFold 2.0"
+#define PACKAGE_STRING "HFold 2.1.0"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "HFold"
 
 /* Define to the home page for this package. */
-#define PACKAGE_URL ""
+#define PACKAGE_URL "https://github.com/TheCOBRALab/HFold"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "2.0"
+#define PACKAGE_VERSION "2.1.0"
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
@@ -85,7 +85,7 @@
 #define UNUSED __attribute__ ((unused))
 
 /* Version number of package */
-#define VERSION "2.0"
+#define VERSION "2.1.0"
 
 /* Define to empty if `const' does not conform to ANSI C. */
 /* #undef const */

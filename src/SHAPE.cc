@@ -5,12 +5,15 @@
 #include <sstream>
 #include <fstream>
 #include <cmath>
+#include <cctype>
+#include <cstdlib>
+#include <stdexcept>
 
 
 SHAPEData::SHAPEData(const std::string &filename, cand_pos_t n, double slope, double intercept): slope(slope), intercept(intercept), n(n), calculated(n + 1, 0.0){
     if (!exists(filename)){
         if(filename != ""){
-            vrna_message_warning("Warning, invalid Shape file name: %c\n", filename.c_str());
+            vrna_message_warning("Warning, invalid Shape file name: %s\n", filename.c_str());
         }
         return;
     }
@@ -53,8 +56,22 @@ bool SHAPEData::exists(const std::string &filename) {
     return (stat(filename.c_str(), &buffer) == 0);
 }
 
-double SHAPEData::get_calculated(cand_pos_t i){
-    return calculated[i];
+double SHAPEData::get_calculated(cand_pos_t index)
+{
+    // An empty filename creates a zero-length SHAPE data set. This is the
+    // normal "SHAPE disabled" state, so every contribution is zero.
+    if (n == 0) {
+        return 0.0;
+    }
+
+    if (index < 0 || index > n) {
+        throw std::out_of_range(
+            "SHAPEData index " + std::to_string(index) +
+            " is outside [0, " + std::to_string(n) + "]"
+        );
+    }
+
+    return calculated.at(static_cast<std::size_t>(index));
 }
 
 double SHAPEData::calculate(double reactivity){

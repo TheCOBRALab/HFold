@@ -1,5 +1,5 @@
 package "HFold"
-version "2.0"
+version "2.1"
 args "--unamed-opts=input"
 
 purpose "Possibly pseudoknotted minimum free energy folding of RNAs"

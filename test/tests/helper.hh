@@ -1,6 +1,7 @@
 #ifndef HELPER_H
 #define HELPER_H
 #include <string>
+#include <SHAPE.hh>
 
 struct HFoldParams {
     std::string sequence = "";
@@ -10,6 +11,7 @@ struct HFoldParams {
     bool pk_only = false;
     int dangles = 2;
     int suboptCount = 1;
+    SHAPEData shape_data{"", (cand_pos_t) sequence.size()};
     std::string fileI = "";
     std::string fileO = "";
     std::string paramFile = "rna_DirksPierce09.par";

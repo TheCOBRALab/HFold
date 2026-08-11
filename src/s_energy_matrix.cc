@@ -1,5 +1,5 @@
 /***************************************************************************
-                          s_energy_matrix.cpp  -  description
+                          s_energy_matrix.cc  -  description
                              -------------------
     begin                : Fri Apr 12 2002
     copyright            : (C) 2002 by Mirela Andronescu

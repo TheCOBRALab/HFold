@@ -1,12 +1,11 @@
-// hfold_bindings.cpp
+// hfold_bindings.cc
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <filesystem>
 
-#include <HFold.hpp>
-#include <Result.hpp>
-#include <W_final.hpp>
+#include <HFold.hh>
+#include <Result.hh>
 #include <iostream>
 
 namespace py = pybind11;

@@ -1,29 +1,23 @@
-cmake_minimum_required(VERSION 3.15)
+add_executable(HFoldTests
+    tests/test_hfold.cc
+    tests/helper.cc
+)
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+target_link_libraries(HFoldTests PRIVATE
+    HFoldLib
+    GTest::gtest_main
+)
 
 include(GoogleTest)
 
-set(TEST_TARGET HFoldTests)
+# The tests use paths relative to the test binary directory. Copy the complete
+# fixture directories so both input variants and expected output are present.
+file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/tests/input"
+     DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
+file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/tests/expected_output"
+     DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 
-set(SOURCES
-    tests/test_hfold.cpp
-    tests/helper.cpp
+gtest_discover_tests(HFoldTests
+    DISCOVERY_TIMEOUT 30
+    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
 )
-
-add_executable(${TEST_TARGET} ${SOURCES})
-target_link_libraries(${TEST_TARGET} PUBLIC
-    gtest_main
-    HFoldLib
-)
-target_include_directories(${TEST_TARGET} PRIVATE ${CMAKE_SOURCE_DIR}/src)
-
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/tests/input DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/tests/expected_output DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-
-gtest_discover_tests(${TEST_TARGET}
-    DISCOVERY_MODE PRE_TEST
-    EXTRA_ARGS --gtest_color=yes
-)
-

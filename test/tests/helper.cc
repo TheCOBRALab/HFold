@@ -5,8 +5,8 @@
 #include <fstream>
 #include <filesystem>
 
-#include <HFold.hpp>
-#include "helper.hpp"
+#include <HFold.hh>
+#include "helper.hh"
 
 std::string capture_console_output(const std::function<void()>& func) {
     std::stringstream buffer;
@@ -68,12 +68,15 @@ std::vector<std::vector<Result>> hfold_test(HFoldParams& p) {
         std::vector<Hotspot> hotspots = build_hotspots(
             current.sequence,
             current.structure,
+            p.shape_data,
             p.suboptCount
         );
 
         std::vector<Result>  results  = fold_hotspots(
             current.sequence,
-            hotspots, p.pk_free,
+            hotspots, 
+            p.shape_data,
+            p.pk_free,
             p.pk_only, p.dangles,
             input_structure_given
         );
