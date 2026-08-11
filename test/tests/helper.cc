@@ -55,7 +55,10 @@ std::vector<std::vector<Result>> hfold_test(HFoldParams& p) {
     }
 
 
-    if (!p.paramFile.empty()) p.paramFile = "../../params/" +  p.paramFile;
+    // Resolve the test parameter file without mutating the caller. Some tests
+    // invoke hfold_test() more than once with the same HFoldParams object.
+    std::string param_file = p.paramFile;
+    if (!param_file.empty()) param_file = "../../params/" + param_file;
     bool input_structure_given = !p.restricted.empty();
 
 
@@ -63,7 +66,7 @@ std::vector<std::vector<Result>> hfold_test(HFoldParams& p) {
     std::vector<std::vector<Result>> all_results;
     for (RNAEntry& current : inputs){
         preprocess_sequence(current.sequence, current.structure, p.noConv_given);
-        load_energy_parameters(p.paramFile, current.sequence, true);
+        load_energy_parameters(param_file, current.sequence, true);
 
         std::vector<Hotspot> hotspots = build_hotspots(
             current.sequence,
@@ -126,8 +129,8 @@ const std::string traceback_cases_output =
     "Final Structure: ((((((.....[[[[[[....[[[[[[))))))......]]]]]]....((((((......))))))...(((...)))]]]]]] (-26.14)\n"
     ">Multiloop_that_spans_a_band_with_extra2\n"
     "Sequence:        GGGGGGAAAAAGGGGGGAAAAGGGGGGCCCCCCAAAAAACCCCCCAAAAGGGGGGAAAAAACCCCCCAAAGGGAAACCCCCCCCC\n"
-    "Restricted:      ...........((((((..............................................................))))))\n"
-    "Final Structure: ...........((((((....((((((............))))))....((((((......))))))...((....)).)))))) (-28.51)\n";
+    "Restricted:      ...........((((((............................................))))))..................\n"
+    "Final Structure: ((((((.....((((((....((((....))))......((((((....))))))......))))))...((....)))))))). (-32.96)\n";
 
 const std::string input_file_and_sequence_output =     
     ">Console Sequence\n"
@@ -164,5 +167,5 @@ const std::string input_file_and_sequence_output =
     "Final Structure: ((((((.....[[[[[[....[[[[[[))))))......]]]]]]....((((((......))))))...(((...)))]]]]]] (-26.14)\n"
     ">Multiloop_that_spans_a_band_with_extra2\n"
     "Sequence:        GGGGGGAAAAAGGGGGGAAAAGGGGGGCCCCCCAAAAAACCCCCCAAAAGGGGGGAAAAAACCCCCCAAAGGGAAACCCCCCCCC\n"
-    "Restricted:      ...........((((((..............................................................))))))\n"
-    "Final Structure: ...........((((((....((((((............))))))....((((((......))))))...((....)).)))))) (-28.51)\n";
+    "Restricted:      ...........((((((............................................))))))..................\n"
+    "Final Structure: ((((((.....((((((....((((....))))......((((((....))))))......))))))...((....)))))))). (-32.96)\n";

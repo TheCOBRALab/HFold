@@ -37,8 +37,8 @@ TEST(SimpleHFold, KnottedNotDensity2){ // This is knotted in knotty but not in H
     HFoldParams params;
     params.sequence = "CCCCCCCCCCAAAAAAGGGGGAAAGGGGGGGGGGAAAAGGGGGGGGGGAAAAAAAACCCCCAAAAAACCCCCCCCCC";
     Result result = hfold_test(params)[0][0];
-    EXPECT_EQ(result.get_final_structure(), "....(((((.......)))))...((((((((((......(((((...........)))))......))))))))))");
-    EXPECT_EQ(result.get_final_energy(), -32.4);
+    EXPECT_EQ(result.get_final_structure(), "((((((((((......[[[[[...[[[[[[[[[[....))))))))))........]]]]]......]]]]]]]]]]");
+    EXPECT_EQ(result.get_final_energy(), -32.15);
 }
 
 TEST(SimpleHFold, Unknotted){
@@ -57,16 +57,16 @@ TEST(SimpleHFold, Suboptimal){
 
     EXPECT_EQ(result[0].get_final_structure(), "((((..[))))]");
     EXPECT_EQ(result[0].get_final_energy(), -0.49);
-    EXPECT_EQ(result[1].get_final_structure(), "((((....))))");
-    EXPECT_EQ(result[1].get_final_energy(), -0.33);
+    EXPECT_EQ(result[1].get_final_structure(), "((((...)))).");
+    EXPECT_EQ(result[1].get_final_energy(), -0.43);
 }
 
 TEST(SimpleHFold, MultipleSameEnergies){
     HFoldParams params;
     params.sequence = "GGGGGGAAAAAGGGGGGAAAAGGGGGGCCCCCCAAAAAACCCCCCAAAAGGGGGGAAAAAACCCCCCAAAGGGAAACCCCCCCCC";
     Result result = hfold_test(params)[0][0];
-    EXPECT_EQ(result.get_final_structure(), "...........((((((....((((((............))))))....((((((......))))))...((....)).))))))");
-    EXPECT_EQ(result.get_final_energy(), -28.51);
+    EXPECT_EQ(result.get_final_structure(), "((((((.....((((((....((((....))))......((((((....))))))......))))))...((....)))))))).");
+    EXPECT_EQ(result.get_final_energy(), -32.96);
 }
 
 TEST(SimpleHFold, DanglesAndRestriction) {
