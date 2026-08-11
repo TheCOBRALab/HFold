@@ -1,9 +1,10 @@
 #ifndef HFOLD_H
 #define HFOLD_H
-#include "sparse_tree.hpp"
-#include "cmdline.hpp"
-#include "Result.hpp"
-#include "Hotspot.hpp"
+#include "sparse_tree.hh"
+#include "cmdline.hh"
+#include "Result.hh"
+#include "Hotspot.hh"
+#include "SHAPE.hh"
 #include <string>
 
 struct RNAEntry {
@@ -26,13 +27,13 @@ std::vector<RNAEntry> get_all_inputs(const std::string& fileI, const std::string
 bool validateStructure(std::string& sequence, std::string& structure, bool exit_on_invalid = true);
 bool validateSequence(std::string& sequence, bool exit_on_invalid = true);
 void seqtoRNA(std::string &seq);
-std::string hfold(std::string seq, std::string res, double &energy, sparse_tree &tree, bool pk_free, bool pk_only, int dangles);
+std::string hfold(std::string seq, std::string res, double &energy, sparse_tree &tree, SHAPEData &ShapeData, bool pk_free, bool pk_only, int dangles);
 void preprocess_sequence(std::string& seq, std::string& restricted, bool noConv);
 void load_energy_parameters(const std::string& paramFile, const std::string& seq, bool param_given);
-std::vector<Hotspot> build_hotspots(const std::string& seq, const std::string& restricted, int suboptCount);
+std::vector<Hotspot> build_hotspots(const std::string& seq, const std::string& restricted, SHAPEData &ShapeData, int suboptCount);
 std::vector<Result> fold_hotspots(
     const std::string& seq, 
-    const std::vector<Hotspot>& hotspots,
+    const std::vector<Hotspot>& hotspots,SHAPEData &ShapeData,
     bool pk_free, bool pk_only, int dangles,
 	bool input_structure_given
 );

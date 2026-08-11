@@ -1,8 +1,8 @@
-#include "Result.hpp"
-#include "cmdline.hpp"
-#include "W_final.hpp"
-#include "HFold.hpp"
-#include "Hotspot.hpp"
+#include "Result.hh"
+#include "cmdline.hh"
+#include "pseudo_loop.hh"
+#include "HFold.hh"
+#include "Hotspot.hh"
 
 #include <iostream>
 #include <fstream>
@@ -24,22 +24,25 @@ int main(int argc, char* argv[]) {
     bool pk_only           = a.pk_only_given;
     int dangles            = a.dangles_given         ? a.dangles_arg           : 1;
     std::string paramFile  = a.paramFile_given       ? a.paramFile_arg         : std::string(PARAMS_DIR) + "/rna_DirksPierce09.par";
+    std::string shapeFile  = a.shape_given           ? a.shape_arg             : "";
 
     std::vector<RNAEntry> inputs = get_all_inputs(fileI, sequence, restricted);
 
     for (RNAEntry& current : inputs){
         preprocess_sequence(current.sequence, current.structure, a.noConv_given);
         load_energy_parameters(paramFile, current.sequence,a.paramFile_given);
+        SHAPEData ShapeData(shapeFile,current.sequence.length());
 
         std::vector<Hotspot> hotspots = build_hotspots(
             current.sequence,
             current.structure,
+            ShapeData,
             suboptCount
         );
 
         std::vector<Result>  results  = fold_hotspots(
             current.sequence,
-            hotspots, pk_free,
+            hotspots,ShapeData, pk_free,
             pk_only, dangles,
             a.input_structure_given
         );

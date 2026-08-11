@@ -6,28 +6,6 @@ HFold needs a 64bit Linux or macOS operating system to run
 
 ### Software Requirements:
 - CMake 3.15 or greater
-- ViennaRNA 2.7.1
-
-### ViennaRNA package installation
-You will need to install ViennaRNA package in order to compile HFold
-
-1. Download the ViennaRNA package from [ViennaRNA-2.7.1.tar.gz](https://github.com/ViennaRNA/ViennaRNA/releases/download/v2.7.1/ViennaRNA-2.7.1.tar.gz)
-
-
-2. Install the ViennaRNA package:
-```
-tar -zxvf ViennaRNA-2.7.1.tar.gz
-cd ViennaRNA-2.7.1
-./configure --without-perl
-sudo make -j$(nproc)              # Linux
-sudo make -j$(sysctl -n hw.ncpu)  # macOS
-sudo make install
-```
-**Tip:** To speed up compilation, you can parallelize compilation by replacing the `sudo make` command.:
-- Linux: Use `sudo make -j$(nproc)`
-- macOS: Use `sudo make -j$(sysctl -n hw.ncpu)`
-
-For more details about ViennaRNA, see https://github.com/ViennaRNA/ViennaRNA  
 
 ### CMake installation
 
@@ -93,6 +71,7 @@ Usage: HFold[options] [input sequence]
   -k  --pk-only          Only add base pairs which cross the constraint structure. The constraint structure is returned if there are no energetically favorable crossing base pairs
   -d  --dangles          Specify the dangle model to be used (base is 2)
   -P, --paramFile        Read energy parameters from paramfile, instead of using the default parameter set.\n
+  -S, --shape            Give a path to a shape file corresponding to the sequence given
       --noConv           Do not convert DNA into RNA. This will use the Matthews 2004 parameters for DNA
 ```
 

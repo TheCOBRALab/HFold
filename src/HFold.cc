@@ -1,11 +1,11 @@
 // Iterative HFold files
-#include "HFold.hpp"
-#include "cmdline.hpp"
-#include "W_final.hpp"
-#include "h_globals.hpp"
-#include "cmdline.hpp"
-#include "Result.hpp"
-#include "Hotspot.hpp"
+#include "HFold.hh"
+#include "cmdline.hh"
+#include "pseudo_loop.hh"
+#include "h_globals.hh"
+#include "cmdline.hh"
+#include "Result.hh"
+#include "Hotspot.hh"
 // a simple driver for the HFold
 #include <iostream>
 #include <fstream>
@@ -202,9 +202,9 @@ bool validateSequence(std::string& sequence, bool exit_on_invalid){
     return true;
 }
 
-std::string hfold(std::string seq,std::string res, double &energy, sparse_tree &tree, bool pk_free, bool pk_only, int dangle){
-	W_final min_fold(seq,res, pk_free, pk_only, dangle);
-	energy = min_fold.hfold(tree);
+std::string hfold(std::string seq,std::string res, double &energy, sparse_tree &tree, SHAPEData &ShapeData, bool pk_free, bool pk_only, int dangle){
+	pseudo_loop min_fold(seq, res,tree,ShapeData, pk_free, pk_only, dangle);
+    energy = min_fold.hfold();
     std::string structure = min_fold.structure;
     return structure;
 }
@@ -261,16 +261,16 @@ void load_energy_parameters(const std::string& paramFile, const std::string& seq
     }
 }
 
-std::vector<Hotspot> build_hotspots(const std::string& seq, const std::string& restricted, int suboptCount) {
+std::vector<Hotspot> build_hotspots(const std::string& seq, const std::string& restricted, SHAPEData &ShapeData, int suboptCount) {
     std::vector<Hotspot> hotspots;
-    vrna_param_s* params = scale_parameters();
+    vrna_param_s* params = vrna_params(NULL);
 
     if (!restricted.empty()) {
         hotspots.emplace_back(1, restricted.length(), restricted.length() + 1);
         hotspots.back().set_structure(restricted);
     }
     if (static_cast<int>(hotspots.size()) < suboptCount) {
-        get_hotspots(seq, hotspots, suboptCount, params);
+        get_hotspots(seq, hotspots,ShapeData, suboptCount, params);
     }
 
     free(params);
@@ -279,7 +279,7 @@ std::vector<Hotspot> build_hotspots(const std::string& seq, const std::string& r
 
 std::vector<Result> fold_hotspots(
     const std::string& seq, 
-    const std::vector<Hotspot>& hotspots,
+    const std::vector<Hotspot>& hotspots, SHAPEData &ShapeData,
     bool pk_free, bool pk_only, int dangles,
 	bool input_structure_given
 ) {
@@ -289,7 +289,7 @@ std::vector<Result> fold_hotspots(
     for (const Hotspot& hs : hotspots) {
         double energy = 0.0;
         sparse_tree tree(hs.get_structure(), seq.size());
-        std::string final_structure = hfold(seq, hs.get_structure(), energy, tree, pk_free, pk_only, dangles);
+        std::string final_structure = hfold(seq, hs.get_structure(), energy, tree,ShapeData, pk_free, pk_only, dangles);
 		if (!input_structure_given && energy > 0.0) {
 			energy = 0.0;
 			final_structure = std::string(seq.length(), '.');

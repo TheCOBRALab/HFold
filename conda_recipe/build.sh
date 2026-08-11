@@ -21,31 +21,12 @@ mkdir  build
 cd     build
 
 # ──────────────────────────────────────────────────────────────
-# 2 · Unpack ViennaRNA, patch and build ViennaRNA
-# ──────────────────────────────────────────────────────────────
-curl -L -O https://github.com/ViennaRNA/ViennaRNA/releases/download/v2.7.1/ViennaRNA-2.7.1.tar.gz
-tar -xf  ./ViennaRNA-2.7.1.tar.gz
-cd   ViennaRNA-2.7.1
-
-
-./configure --without-perl --without-python --prefix="${PREFIX}"
-make  -j"${CPU_COUNT}"
-
-# override pkgpyexecdir so "make install" never touches /RNA (/RNA needs sudo access)
-make  -j"${CPU_COUNT}" pkgpyexecdir="${PY_SITE_DIR}" install
-
-cd .. # back to build dir
-
-# ──────────────────────────────────────────────────────────────
-# 4 · CMake phase for your own project that links ViennaRNA
+# 2 · CMake phase for your own project that links ViennaRNA
 # ──────────────────────────────────────────────────────────────
 cmake .. \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_C_COMPILER="${CC}" \
   -DCMAKE_CXX_COMPILER="${CXX}" \
-  -DCMAKE_C_FLAGS="-DHAVE_STRDUP=1" \
-  -DVIENNARNA_LIB="${PREFIX}" \
-  -DVIENNARNA_INCLUDE_DIR="${PREFIX}/include" \
   -DENABLE_TESTS=OFF
 
 cmake --build . --parallel -- VERBOSE=1

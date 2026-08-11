@@ -1,0 +1,525 @@
+#ifndef MODEL
+#define MODEL
+
+#ifndef NBASES
+#define NBASES 8
+#endif
+
+/** @brief Typename for the model details data structure #vrna_md_s */
+typedef struct vrna_md_s vrna_md_t;
+
+/**
+ *  @brief
+ *  @htmlonly Default temperature for structure prediction and free energy evaluation in &#176C @endhtmlonly
+ *  @latexonly Default temperature for structure prediction and free energy evaluation in $^\circ C$ @endlatexonly
+ *
+ *  @see  #vrna_md_t.temperature, vrna_md_defaults_reset(), vrna_md_set_default()
+ */
+#define VRNA_MODEL_DEFAULT_TEMPERATURE 37.0
+
+/**
+ *  @brief  Default scaling factor for partition function computations
+ *
+ *  @see  #vrna_exp_param_t.pf_scale, vrna_md_defaults_reset(), vrna_md_set_default()
+ */
+#define VRNA_MODEL_DEFAULT_PF_SCALE -1
+
+/**
+ *  @brief  Default scaling factor for absolute thermodynamic temperature in Boltzmann factors
+ *
+ *  @see    #vrna_exp_param_t.alpha, #vrna_md_t.betaScale, vrna_md_defaults_reset(), vrna_md_set_default()
+ */
+#define VRNA_MODEL_DEFAULT_BETA_SCALE 1.
+
+/**
+ *  @brief  Default dangling end model
+ *
+ *  @see  #vrna_md_t.dangles, vrna_md_defaults_reset(), vrna_md_set_default()
+ */
+#define VRNA_MODEL_DEFAULT_DANGLES 2
+
+/**
+ *  @brief  Default model behavior for lookup of special tri-, tetra-, and hexa-loops
+ *
+ *  @see    #vrna_md_t.special_hp, vrna_md_defaults_reset(), vrna_md_set_default()
+ */
+#define VRNA_MODEL_DEFAULT_SPECIAL_HP 1
+
+/**
+ *  @brief  Default model behavior for so-called 'lonely pairs'
+ *  @see    #vrna_md_t.noLP, vrna_md_defaults_reset(), vrna_md_set_default()
+ */
+#define VRNA_MODEL_DEFAULT_NO_LP          0
+
+/**
+ *  @brief  Default model behavior for G-U base pairs
+ *
+ *  @see    #vrna_md_t.noGU, vrna_md_defaults_reset(), vrna_md_set_default()
+ */
+#define VRNA_MODEL_DEFAULT_NO_GU 0
+
+/**
+ *  @brief  Default model behavior for G-U base pairs closing a loop
+ *
+ *  @see    #vrna_md_t.noGUclosure, vrna_md_defaults_reset(), vrna_md_set_default()
+ */
+#define VRNA_MODEL_DEFAULT_NO_GU_CLOSURE 0
+
+/**
+ *  @brief  Default model behavior to treat a molecule as a circular RNA (DNA)
+ *  @see    #vrna_md_t.circ, vrna_md_defaults_reset(), vrna_md_set_default()
+ */
+#define VRNA_MODEL_DEFAULT_CIRC           0
+
+/**
+ *  @brief  Default model behavior regarding the treatment of G-Quadruplexes
+ *  @see    #vrna_md_t.gquad, vrna_md_defaults_reset(), vrna_md_set_default()
+ */
+#define VRNA_MODEL_DEFAULT_GQUAD          0
+
+/**
+ *  @brief  Default behavior of the model regarding unique multi-branch loop decomposition
+ *  @see    #vrna_md_t.uniq_ML, vrna_md_defaults_reset(), vrna_md_set_default()
+ */
+#define VRNA_MODEL_DEFAULT_UNIQ_ML        0
+
+/**
+ *  @brief  Default model behavior on which energy set to use
+ *
+ *  @see    #vrna_md_t.energy_set, vrna_md_defaults_reset(), vrna_md_set_default()
+ */
+#define VRNA_MODEL_DEFAULT_ENERGY_SET 0
+
+/**
+ *  @brief  Default model behavior with regards to backtracking of structures
+ *  @see    #vrna_md_t.backtrack, vrna_md_defaults_reset(), vrna_md_set_default()
+ */
+#define VRNA_MODEL_DEFAULT_BACKTRACK      1
+
+/**
+ *  @brief  Default model behavior on what type of backtracking to perform
+ *  @see    #vrna_md_t.backtrack_type, vrna_md_defaults_reset(), vrna_md_set_default()
+ */
+#define VRNA_MODEL_DEFAULT_BACKTRACK_TYPE 'F'
+
+/**
+ *  @brief  Default model behavior with regards to computing base pair probabilities
+ *  @see    #vrna_md_t.compute_bpp, vrna_md_defaults_reset(), vrna_md_set_default()
+ */
+#define VRNA_MODEL_DEFAULT_COMPUTE_BPP    1
+
+/**
+ *  @brief  Default model behavior for the allowed maximum base pair span
+ *
+ *  @see    #vrna_md_t.max_bp_span, vrna_md_defaults_reset(), vrna_md_set_default()
+ */
+#define VRNA_MODEL_DEFAULT_MAX_BP_SPAN -1
+
+/**
+ *  @brief  Default model behavior for the sliding window approach
+ *  @see    #vrna_md_t.window_size, vrna_md_defaults_reset(), vrna_md_set_default()
+ */
+#define VRNA_MODEL_DEFAULT_WINDOW_SIZE    -1
+
+/**
+ *  @brief  Default model behavior on how to evaluate the energy contribution of multi-branch loops
+ *  @see    #vrna_md_t.logML, vrna_md_defaults_reset(), vrna_md_set_default()
+ */
+#define VRNA_MODEL_DEFAULT_LOG_ML         0
+
+/**
+ *  @brief  Default model behavior for consensus structure energy evaluation
+ *  @see    #vrna_md_t.oldAliEn, vrna_md_defaults_reset(), vrna_md_set_default()
+ */
+#define VRNA_MODEL_DEFAULT_ALI_OLD_EN     0
+
+/**
+ *  @brief  Default model behavior for consensus structure co-variance contribution assessment
+ *  @see    #vrna_md_t.ribo, vrna_md_defaults_reset(), vrna_md_set_default()
+ */
+#define VRNA_MODEL_DEFAULT_ALI_RIBO       0
+
+/**
+ *  @brief  Default model behavior for weighting the co-variance score in consensus structure prediction
+ *  @see    #vrna_md_t.cv_fact, vrna_md_defaults_reset(), vrna_md_set_default()
+ */
+#define VRNA_MODEL_DEFAULT_ALI_CV_FACT    1.
+
+/** @brief  Default model behavior for weighting the nucleotide conservation? in consensus structure prediction
+ *  @see    #vrna_md_t.nc_fact, vrna_md_defaults_reset(), vrna_md_set_default()
+ */
+#define VRNA_MODEL_DEFAULT_ALI_NC_FACT    1.
+
+/**
+ *  @brief  Default model behavior on how to evaluate the energy contribution of multi-branch loops
+ *
+ *  @see    #vrna_md_t.logML, vrna_md_defaults_reset(), vrna_md_set_default()
+ */
+#define VRNA_MODEL_DEFAULT_LOG_ML 0
+
+#define VRNA_MODEL_DEFAULT_PF_SMOOTH 1
+
+/**
+ *  @brief  Default model salt concentration (M)
+ */
+#define VRNA_MODEL_DEFAULT_SALT 1.021
+
+/**
+ *  @brief  Default model lower bound of multiloop size for salt correction fiting
+ */
+#define VRNA_MODEL_DEFAULT_SALT_MLLOWER 6
+
+/**
+ *  @brief  Default model upper bound of multiloop size for salt correction fiting
+ */
+#define VRNA_MODEL_DEFAULT_SALT_MLUPPER 24
+
+/**
+ *  @brief  Default model value to turn off user-provided salt correction for duplex initializtion
+ */
+#define VRNA_MODEL_DEFAULT_SALT_DPXINIT 99999
+
+#define VRNA_MODEL_SALT_DPXINIT_FACT_RNA -45.324
+#define VRNA_MODEL_SALT_DPXINIT_FACT_DNA -58.389
+
+#define VRNA_MODEL_DEFAULT_SALT_DPXINIT_FACT VRNA_MODEL_SALT_DPXINIT_FACT_RNA
+
+/* Geometric parameters for RNA and DNA */
+
+#define VRNA_MODEL_HELICAL_RISE_RNA 2.8
+#define VRNA_MODEL_HELICAL_RISE_DNA 3.4
+/**
+ *  @brief  Default helical rise
+ */
+#define VRNA_MODEL_DEFAULT_HELICAL_RISE VRNA_MODEL_HELICAL_RISE_RNA
+
+#define VRNA_MODEL_BACKBONE_LENGTH_RNA 6.0
+#define VRNA_MODEL_BACKBONE_LENGTH_DNA 6.76
+/**
+ *  @brief  Default backbone length
+ */
+#define VRNA_MODEL_DEFAULT_BACKBONE_LENGTH VRNA_MODEL_BACKBONE_LENGTH_RNA
+
+#define VRNA_MODEL_DEFAULT_CIRC_PENALTY 1
+
+#define VRNA_MODEL_DEFAULT_CIRC_ALPHA0 4.385
+
+#ifndef MAXALPHA
+/**
+ *  @brief Maximal length of alphabet
+ */
+#define MAXALPHA 20
+#endif
+
+/**
+ *  internal loops of size 2 get energy 0.8Kcal and
+ *  no mismatches, default 1
+ */
+extern int  james_rule;
+
+/**
+ *  @brief The data structure that contains the complete model details used throughout the calculations
+ *
+ *  For convenience reasons, we provide the type name #vrna_md_t to address this data structure
+ *  without the use of the struct keyword
+ *
+ *  @see  vrna_md_set_default(), set_model_details(), vrna_md_update(), #vrna_md_t
+ *
+ */
+/**
+ *  @brief The data structure that contains the complete model details used throughout the calculations
+ *
+ *  For convenience reasons, we provide the type name #vrna_md_t to address this data structure
+ *  without the use of the struct keyword
+ *
+ *  @see  vrna_md_set_default(), set_model_details(), vrna_md_update(), #vrna_md_t
+ *
+ */
+struct vrna_md_s {
+  double  temperature;                      /**<  @brief  The temperature used to scale the thermodynamic parameters */
+  double  betaScale;                        /**<  @brief  A scaling factor for the thermodynamic temperature of the Boltzmann factors */
+  int     pf_smooth;                        /**<  @brief  A flat specifying whether energies in Boltzmann factors need to be smoothed */
+  int     dangles;                          /**<  @brief  Specifies the dangle model used in any energy evaluation (0,1,2 or 3)
+                                             *
+                                             *    If set to 0 no stabilizing energies are assigned to bases adjacent to
+                                             *    helices in free ends and multiloops (so called dangling ends). Normally
+                                             *    (dangles = 1) dangling end energies are assigned only to unpaired
+                                             *    bases and a base cannot participate simultaneously in two dangling ends. In
+                                             *    the partition function algorithm vrna_pf() these checks are neglected.
+                                             *    To provide comparability between free energy minimization and partition function
+                                             *    algorithms, the default setting is 2.
+                                             *    This treatment of dangling ends gives more favorable energies to helices
+                                             *    directly adjacent to one another, which can be beneficial since such
+                                             *    helices often do engage in stabilizing interactions through co-axial
+                                             *    stacking.\n
+                                             *    If set to 3 co-axial stacking is explicitly included for
+                                             *    adjacent helices in multiloops. The option affects only mfe folding
+                                             *    and energy evaluation (vrna_mfe() and vrna_eval_structure()), as
+                                             *    well as suboptimal folding (vrna_subopt()) via re-evaluation of energies.
+                                             *    Co-axial stacking with one intervening mismatch is not considered so far.
+                                             *    Note, that some function do not implement all dangle model but only a subset of
+                                             *    (0,1,2,3). In particular, partition function algorithms can only handle
+                                             *    0 and 2. Read the documentation of the particular recurrences or
+                                             *    energy evaluation function for information about the provided dangle
+                                             *    model.
+                                             */
+  int     special_hp;                       /**<  @brief  Include special hairpin contributions for tri, tetra and hexaloops */
+  int     noLP;                             /**<  @brief  Only consider canonical structures, i.e. no 'lonely' base pairs */
+  int     noGU;                             /**<  @brief  Do not allow GU pairs */
+  int     noGUclosure;                      /**<  @brief  Do not allow loops to be closed by GU pair */
+  int     logML;                            /**<  @brief  Use logarithmic scaling for multiloops */
+  int     circ;                             /**<  @brief  Assume RNA to be circular instead of linear */
+  int     circ_penalty;                     /**<  @brief  Add an entropic penalty to the unpaired circRNA chain */ 
+  int     gquad;                            /**<  @brief  Include G-quadruplexes in structure prediction */
+  int     uniq_ML;                          /**<  @brief  Flag to ensure unique multi-branch loop decomposition during folding */
+  int     energy_set;                       /**<  @brief  Specifies the energy set that defines set of compatible base pairs */
+  int     backtrack;                        /**<  @brief  Specifies whether or not secondary structures should be backtraced */
+  char    backtrack_type;                   /**<  @brief  Specifies in which matrix to backtrack */
+  int     compute_bpp;                      /**<  @brief  Specifies whether or not backward recursions for base pair probability (bpp) computation will be performed */
+  char    nonstandards[64];                 /**<  @brief  contains allowed non standard bases */
+  int     max_bp_span;                      /**<  @brief  maximum allowed base pair span */
+
+  int     min_loop_size;                    /**<  @brief  Minimum size of hairpin loops
+                                             *
+                                             *    The default value for this field is #TURN, however, it may
+                                             *    be 0 in cofolding context.
+                                             */
+  int     window_size;                      /**<  @brief  Size of the sliding window for locally optimal structure prediction */
+  int     oldAliEn;                         /**<  @brief  Use old alifold energy model */
+  int     ribo;                             /**<  @brief  Use ribosum scoring table in alifold energy model */
+  double  cv_fact;                          /**<  @brief  Co-variance scaling factor for consensus structure prediction */
+  double  nc_fact;                          /**<  @brief  Scaling factor to weight co-variance contributions of non-canonical pairs */
+  double  sfact;                            /**<  @brief  Scaling factor for partition function scaling */
+  int     rtype[8];                         /**<  @brief  Reverse base pair type array */
+  short   alias[MAXALPHA + 1];              /**<  @brief  alias of an integer nucleotide representation */
+  int     pair[MAXALPHA + 1][MAXALPHA + 1]; /**<  @brief  Integer representation of a base pair */
+  float   pair_dist[7][7];                  /**<  @brief  Base pair dissimilarity, a.k.a. distance matrix */
+  double  salt;                             /**<  @brief  Salt (monovalent) concentration (M) in buffer */
+  int     saltMLLower;                      /**<  @brief  Lower bound of multiloop size to use in loop salt correction linear fitting */
+  int     saltMLUpper;                      /**<  @brief  Upper bound of multiloop size to use in loop salt correction linear fitting */
+  int     saltDPXInit;                      /**<  @brief  User-provided salt correction for duplex initialization (in dcal/mol).
+                                             *    If set to 99999 the default salt correction is used.
+                                             *    If set to 0 there is no salt correction for duplex initialization.
+                                             */
+  float   saltDPXInitFact;                  /**<  @brief  */
+  float   helical_rise;                     /**<  @brief  */
+  float   backbone_length;                  /**<  @brief  */
+
+  double  circ_alpha0;
+};
+
+/**
+ * @brief Apply default model details to a provided #vrna_md_t data structure
+ *
+ *  Use this function to initialize a #vrna_md_t data structure with
+ *  its default values
+ *
+ *  @param md A pointer to the data structure that is about to be initialized
+ */
+void vrna_md_set_default(vrna_md_t *md);
+
+/**
+ *  @brief Copy/Clone a #vrna_md_t model
+ *
+ *  Use this function to clone a given model either inplace (target container @p md_to
+ *  given) or create a copy by cloning the source model and returning it (@p md_to == NULL).
+ *
+ *  @param md_to    The model to be overwritten (if non-NULL and @p md_to != @p md_from)
+ *  @param md_from  The model to copy (if non-NULL)
+ *  @return         A pointer to the copy model (or NULL if @p md_from == NULL)
+ */
+vrna_md_t* vrna_md_copy(vrna_md_t *md_to, const vrna_md_t *md_from);
+
+/**
+ *  @brief Update the model details data structure
+ *
+ *  This function should be called after changing the vrna_md_t.energy_set attribute
+ *  since it re-initializes base pairing related arrays within the #vrna_md_t data
+ *  structure. In particular, #vrna_md_t.pair, #vrna_md_t.alias, and #vrna_md_t.rtype
+ *  are set to the values that correspond to the specified #vrna_md_t.energy_set
+ *  option
+ *
+ *  @see  #vrna_md_t, #vrna_md_t.energy_set, #vrna_md_t.pair, #vrna_md_t.rtype,
+ *        #vrna_md_t.alias, vrna_md_set_default()
+ */
+void vrna_md_update(vrna_md_t *md);
+
+
+/* BEGIN deprecated global variables: */
+
+/**
+ *  @brief Rescale energy parameters to a temperature in degC.
+ *
+ *  Default is 37C. You have to call the update_..._params() functions after
+ *  changing this parameter.
+ *
+ *  @deprecated   Use vrna_md_defaults_temperature(), and vrna_md_defaults_temperature_get()
+ *                to change, and read the global default temperature settings
+ *
+ *  @see vrna_md_defaults_temperature(), vrna_md_defaults_temperature_get(), vrna_md_defaults_reset()
+ */
+extern double temperature;
+
+/**
+ *  @brief A scaling factor used by pf_fold() to avoid overflows.
+ *
+ *  Should be set to approximately @f$exp{((-F/kT)/length)}@f$, where @f$F@f$ is an estimate
+ *  for the ensemble free energy, for example the minimum free energy. You must
+ *  call update_pf_params() after changing this parameter.\n
+ *  If pf_scale is -1 (the default) , an estimate will be provided
+ *  automatically when computing partition functions, e.g. pf_fold()
+ *  The automatic estimate is usually insufficient for sequences more
+ *  than a few hundred bases long.
+ */
+extern double pf_scale;
+
+/**
+ *  @brief Switch the energy model for dangling end contributions (0, 1, 2, 3)
+ *
+ *  If set to 0 no stabilizing energies are assigned to bases adjacent to
+ *  helices in free ends and multiloops (so called dangling ends). Normally
+ *  (dangles = 1) dangling end energies are assigned only to unpaired
+ *  bases and a base cannot participate simultaneously in two dangling ends. In
+ *  the partition function algorithm pf_fold() these checks are neglected.
+ *  If #dangles is set to 2, all folding routines will follow this convention.
+ *  This treatment of dangling ends gives more favorable energies to helices
+ *  directly adjacent to one another, which can be beneficial since such
+ *  helices often do engage in stabilizing interactions through co-axial
+ *  stacking.\n
+ *  If dangles = 3 co-axial stacking is explicitly included for
+ *  adjacent helices in multiloops. The option affects only mfe folding
+ *  and energy evaluation (fold() and energy_of_structure()), as
+ *  well as suboptimal folding (subopt()) via re-evaluation of energies.
+ *  Co-axial stacking with one intervening mismatch is not considered so far.
+ *
+ *  Default is 2 in most algorithms, partition function algorithms can only handle 0 and 2
+ */
+extern int dangles;
+
+/**
+ *  @brief Include special stabilizing energies for some tri-, tetra- and hexa-loops;
+ *
+ *  default is 1.
+ */
+extern int tetra_loop;
+
+/**
+ *  @brief Global switch to avoid/allow helices of length 1
+ *
+ *  Disallow all pairs which can only occur as lonely pairs (i.e. as helix
+ *  of length 1). This avoids lonely base pairs in the predicted structures in
+ *  most cases.
+ */
+extern int  noLonelyPairs;
+
+/**
+ *  @brief Global switch to forbid/allow GU base pairs at all
+ */
+extern int  noGU;
+
+/**
+ *  @brief GU allowed only inside stacks if set to 1
+ */
+extern int  no_closingGU;
+
+/**
+ *  @brief backward compatibility variable.. this does not effect anything
+ */
+extern int  circ;
+
+/**
+ *  @brief Allow G-quadruplex formation
+ */
+extern int  gquad;
+
+/**
+ *  @brief do ML decomposition uniquely (for subopt)
+ */
+extern int  uniq_ML;
+
+/**
+ *  @brief 0 = BP; 1=any with GC; 2=any with AU-parameter
+ *
+ *  If set to 1 or 2: fold sequences from an artificial alphabet ABCD..., where A
+ *  pairs B, C pairs D, etc. using either GC (1) or AU parameters (2);
+ *  default is 0, you probably don't want to change it.
+ */
+extern int energy_set;
+
+/**
+ *  @brief do backtracking, i.e. compute secondary structures or base pair probabilities
+ *
+ *  If 0, do not calculate pair probabilities in pf_fold(); this is about
+ *  twice as fast. Default is 1.
+ */
+extern int do_backtrack;
+
+/**
+ *  @brief A backtrack array marker for inverse_fold()
+ *
+ *  If set to 'C': force (1,N) to be paired,
+ *  'M' fold as if the sequence were inside a multiloop. Otherwise ('F') the
+ *  usual mfe structure is computed.
+ */
+extern char backtrack_type;
+
+/**
+ *  @brief contains allowed non standard base pairs
+ *
+ *  Lists additional base pairs that will be allowed to form in addition to
+ *  GC, CG, AU, UA, GU and UG. Nonstandard base pairs are given a stacking
+ *  energy of 0.
+ */
+extern char *nonstandards;
+
+/**
+ *  @brief Maximum allowed base pair span
+ *
+ *  A value of -1 indicates no restriction for distant base pairs.
+ */
+extern int    max_bp_span;
+
+/**
+ *  @brief use old alifold energies (with gaps)
+ */
+extern int    oldAliEn;
+
+/**
+ *  @brief use ribosum matrices
+ */
+extern int    ribo;
+
+extern double cv_fact;
+
+extern double nc_fact;
+
+/** @brief if nonzero use logarithmic ML energy in energy_of_struct  */
+extern int    logML;
+
+/** @brief salt concentration */
+extern double salt;
+
+/** @brief Salt correction for duplex initialization */
+extern int saltDPXInit;
+
+extern float  helical_rise;
+extern float  backbone_length;
+
+/* END deprecated global variables: */
+
+/**
+ * @brief Set default model details
+ *
+ *  Use this function if you wish to initialize a #vrna_md_t data structure with
+ *  its default values, i.e. the global model settings as provided by the deprecated
+ *  global variables.
+ *
+ *  @deprecated This function will vanish as soon as backward compatibility of
+ *              RNAlib is dropped (expected in version 3).
+ *              Use vrna_md_set_default() instead!
+ *
+ *  @param md A pointer to the data structure that is about to be initialized
+ */
+void set_model_details(vrna_md_t *md);
+
+#endif

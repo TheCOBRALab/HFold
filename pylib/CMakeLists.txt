@@ -3,15 +3,16 @@ cmake_minimum_required(VERSION 3.15)
 find_package(pybind11 CONFIG REQUIRED)
 
 pybind11_add_module(hfold_python
-    ${CMAKE_SOURCE_DIR}/src/W_final.cpp
-    ${CMAKE_SOURCE_DIR}/src/pseudo_loop.cpp
-    ${CMAKE_SOURCE_DIR}/src/HFold.cpp
-    ${CMAKE_SOURCE_DIR}/src/cmdline.cpp
-    ${CMAKE_SOURCE_DIR}/src/Result.cpp
-    ${CMAKE_SOURCE_DIR}/src/s_energy_matrix.cpp
-    ${CMAKE_SOURCE_DIR}/src/Hotspot.cpp
-    ${CMAKE_SOURCE_DIR}/src/sparse_tree.cpp
-    ${CMAKE_SOURCE_DIR}/pylib/bindings/pybind_module.cpp
+    ${CMAKE_SOURCE_DIR}/src/pseudo_loop.cc
+    ${CMAKE_SOURCE_DIR}/src/pseudo_loop_trace.cc
+    ${CMAKE_SOURCE_DIR}/src/HFold.cc
+    ${CMAKE_SOURCE_DIR}/src/cmdline.cc
+    ${CMAKE_SOURCE_DIR}/src/Result.cc
+    ${CMAKE_SOURCE_DIR}/src/s_energy_matrix.cc
+    ${CMAKE_SOURCE_DIR}/src/Hotspot.cc
+    ${CMAKE_SOURCE_DIR}/src/sparse_tree.cc
+    ${CMAKE_SOURCE_DIR}/src/SHAPE.cc
+    ${CMAKE_SOURCE_DIR}/pylib/bindings/pybind_module.cc
 )
 
 target_include_directories(hfold_python
