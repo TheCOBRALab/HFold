@@ -94,8 +94,9 @@ install(TARGETS HFold
     RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
 )
 
-# Unit tests use the vendored GoogleTest tree already present in test/.
-if(ENABLE_TESTS)
+if (NOT ENABLE_TESTS)
+    message(STATUS "Unit tests are disabled. To enable them, set -DBUILD_TESTING=ON")
+elseif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test/googletest/CMakeLists.txt")
     enable_testing()
 
     set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)
@@ -103,7 +104,26 @@ if(ENABLE_TESTS)
 
     add_subdirectory(test/googletest EXCLUDE_FROM_ALL)
     add_subdirectory(test)
+else()
+    message(WARNING "
+============================================================
+ GoogleTest submodule not found. Unit tests will be disabled.
+------------------------------------------------------------
+To enable unit testing, please do one of the following:
+
+  1. If you already cloned the repository:
+     Run the following command to initialize submodules:
+         git submodule update --init --recursive
+
+  2. If you haven't cloned the repository yet:
+     Clone it with submodules using:
+         git clone --recursive <repo-url>
+
+After initializing the submodule, re-run CMake to enable tests.
+============================================================")
+
 endif()
+
 
 # Preserve the BUILD_PYTHON option observed in the original configuration.
 # This recognizes the two conventional binding locations without affecting the
