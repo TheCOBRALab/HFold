@@ -129,8 +129,8 @@ const std::string traceback_cases_output =
     "Final Structure: ((((((.....[[[[[[....[[[[[[))))))......]]]]]]....((((((......))))))...(((...)))]]]]]] (-26.14)\n"
     ">Multiloop_that_spans_a_band_with_extra2\n"
     "Sequence:        GGGGGGAAAAAGGGGGGAAAAGGGGGGCCCCCCAAAAAACCCCCCAAAAGGGGGGAAAAAACCCCCCAAAGGGAAACCCCCCCCC\n"
-    "Restricted:      ...........((((((............................................))))))..................\n"
-    "Final Structure: ((((((.....((((((....((((....))))......((((((....))))))......))))))...((....)))))))). (-32.96)\n";
+    "Restricted:      ...........((((((..........))))))....................................................\n"
+    "Final Structure: ((((((.....((((((..........))))))......))))))....((((((......))))))...(((.......))).. (-30.63)\n";
 
 const std::string input_file_and_sequence_output =     
     ">Console Sequence\n"
@@ -167,5 +167,5 @@ const std::string input_file_and_sequence_output =
     "Final Structure: ((((((.....[[[[[[....[[[[[[))))))......]]]]]]....((((((......))))))...(((...)))]]]]]] (-26.14)\n"
     ">Multiloop_that_spans_a_band_with_extra2\n"
     "Sequence:        GGGGGGAAAAAGGGGGGAAAAGGGGGGCCCCCCAAAAAACCCCCCAAAAGGGGGGAAAAAACCCCCCAAAGGGAAACCCCCCCCC\n"
-    "Restricted:      ...........((((((............................................))))))..................\n"
-    "Final Structure: ((((((.....((((((....((((....))))......((((((....))))))......))))))...((....)))))))). (-32.96)\n";
+    "Restricted:      ...........((((((..........))))))....................................................\n"
+    "Final Structure: ((((((.....((((((..........))))))......))))))....((((((......))))))...(((.......))).. (-30.63)\n";

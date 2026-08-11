@@ -855,4 +855,9 @@ void get_hotspots(std::string seq, std::vector<Hotspot> &hotspot_list, SHAPEData
     return;
 }
 
-bool compare_hotspot_ptr(Hotspot &a, Hotspot &b) { return (a.get_energy() < b.get_energy()); }
+bool compare_hotspot_ptr(Hotspot &a, Hotspot &b) {
+    if (a.get_energy() != b.get_energy()) {
+        return a.get_energy() < b.get_energy();
+    }
+    return a.get_structure() < b.get_structure();
+}
