@@ -124,7 +124,7 @@ energy_t pseudo_loop::compute_energy_VM_restricted(cand_pos_t i, cand_pos_t j)
 // compute the MFE of a multi-loop closed at (i,j), the restricted case
 {
     energy_t min = INF;
-    for (cand_pos_t k = i + 1; k <= j - TURN - 1; ++k) {
+    for (cand_pos_t k = i + 1; k <= j - TURN; ++k) {
         energy_t WM2ij = WM.get(i+1,k-1) + WMv.get(k,j-1);
         WM2ij = std::min(WM2ij, WM.get(i + 1, k - 1) + WMp.get(k, j - 1));
         if (tree->up[k - 1] >= (k - (i + 1))) WM2ij = std::min(WM2ij, static_cast<energy_t>((k - i - 1) * params_->MLbase) + WMp.get(k, j - 1));
@@ -730,8 +730,8 @@ energy_t pseudo_loop::E_MbLoop(const energy_t WM2ij, const energy_t WM2ip1j, con
     base_type si1 = S_[i+1];
     base_type sj1 = S_[j-1];
 
-	auto consider = [&](energy_t v, bool check, base_type s5, base_type s3, int ml_count) {
-        if (check && v == INF) return;
+	auto consider = [&](energy_t v, bool valid, base_type s5, base_type s3, int ml_count) {
+        if (!valid || v == INF) return;
         e = std::min(e, v + E_MLstem(tt, s5, s3, params_) + params_->MLclosing + ml_count * params_->MLbase);
     };
 
@@ -762,7 +762,6 @@ int distance(int left, int right) { return (right - left - 1); }
 // Mateo 13 Sept 2023
 // given a initial hotspot which is a hairpin loop, keep trying to add a arc to form a larger stack
 void expand_hotspot(s_energy_matrix *V, Hotspot &hotspot, int n) {
-    // printf("\nexpanding hotspot: i: %d j: %d\n",hotspot->get_left_inner_index(),hotspot->get_right_inner_index());
     // calculation for the hairpin that is already in there
     V->compute_hotspot_energy(hotspot.get_left_outer_index(), hotspot.get_right_outer_index(), 0);
 
@@ -789,14 +788,10 @@ void expand_hotspot(s_energy_matrix *V, Hotspot &hotspot, int n) {
 
     double energy = V->get_energy(hotspot.get_left_outer_index(), hotspot.get_right_outer_index());
 
-    // printf("here and %d\n",energy);
-    // printf("energy: %lf, AU_total: %d, dangle_top_total: %d, dangle_bot_total: %d\n",energy,non_gc_penalty,dangle_top_penalty,dangle_bot_penalty);
 
     energy = (energy + dangle_penalty) / 100;
 
     hotspot.set_energy(energy);
-    // printf("done: %d %d %d
-    // %d\n",hotspot->get_left_outer_index(),hotspot->get_left_inner_index(),hotspot->get_right_inner_index(),hotspot->get_right_outer_index());
     return;
 }
 
