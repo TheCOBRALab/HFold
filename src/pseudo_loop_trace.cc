@@ -489,7 +489,7 @@ void pseudo_loop::Trace_VP(cand_pos_t i, cand_pos_t j, energy_t e){
     min_borders = std::min({min_borders, edge_i});
     for (cand_pos_t k = i + 1; k < min_borders; ++k) {
         if (tree->tree[k].pair < -1 && (tree->up[(k)-1] >= ((k) - (i)-1))) {
-            cand_pos_t max_borders = std::max(bp_ij, B_ij) + 1;
+            cand_pos_t max_borders = std::max(bp_ij, B_ij);
             cand_pos_t edge_j = k + j - i - MAXLOOP - 2;
             max_borders = std::max({max_borders, edge_j});
             for (cand_pos_t l = j - 1; l > max_borders; --l) {
