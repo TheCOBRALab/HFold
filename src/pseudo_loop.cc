@@ -534,7 +534,7 @@ void pseudo_loop::compute_WMB(cand_pos_t i, cand_pos_t j) {
             // loop would not be treated as case 2
             cand_pos_t Bp_lj = tree->Bp(l, j);
 
-            if (Bp_lj >= 0 && Bp_lj < n) {
+            if (Bp_lj > 0 && Bp_lj <= n) {
                 energy_t sum = get_BE(bp_j, j, tree->tree[Bp_lj].pair, Bp_lj) + WMBP.get(i, l) + WI.get(l + 1, Bp_lj - 1);
                 m2 = std::min(m2, sum);
             }

@@ -353,7 +353,7 @@ void pseudo_loop::Trace_WMB(cand_pos_t i, cand_pos_t j, energy_t e){
         cand_pos_t bp_j = tree->tree[j].pair;
         for (cand_pos_t l = bp_j + 1; l < j; l++) {
             cand_pos_t Bp_lj = tree->Bp(l, j);
-            if (Bp_lj >= 0 && Bp_lj < n) {
+            if (Bp_lj > 0 && Bp_lj <= n) {
                 if (e == get_BE(bp_j,j,tree->tree[Bp_lj].pair,Bp_lj) + WMBP.get(i,l) + WI.get(l+1,Bp_lj-1) + PB_penalty) {
                     Trace_BE(bp_j,j,tree->tree[Bp_lj].pair, Bp_lj,BE.get(bp_j,tree->tree[Bp_lj].pair));
                     Trace_WMBP(i,l,WMBP.get(i,l));
