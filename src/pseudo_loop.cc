@@ -74,11 +74,13 @@ double pseudo_loop::hfold() {
         energy_t m3 = INF;
         if (tree->tree[j].pair < 0) m1 = W[j - 1];
 
-        for (cand_pos_t k = 1; k <= j - TURN - 1; ++k) {
-            if (tree->weakly_closed(1, k - 1)) {
-                energy_t acc = (k > 1) ? W[k - 1] : 0;
-                m2 = std::min(m2, acc + E_ext_Stem(get_energy(k, j), get_energy(k + 1, j), get_energy(k, j - 1), get_energy(k + 1, j - 1), k, j));
-                if (k == 1 || tree->weakly_closed(k, j)) m3 = std::min(m3, acc + WMB.get(k, j) + PS_penalty);
+        if (tree->weakly_closed(1, j)) {
+            for (cand_pos_t k = 1; k <= j - TURN - 1; ++k) {
+                if (tree->weakly_closed(1, k - 1)) {
+                    energy_t acc = (k > 1) ? W[k - 1] : 0;
+                    m2 = std::min(m2, acc + E_ext_Stem(get_energy(k, j), get_energy(k + 1, j), get_energy(k, j - 1), get_energy(k + 1, j - 1), k, j));
+                    if (k == 1 || tree->weakly_closed(k, j)) m3 = std::min(m3, acc + WMB.get(k, j) + PS_penalty);
+                }
             }
         }
         W[j] = std::min({m1, m2, m3});
@@ -90,7 +92,7 @@ double pseudo_loop::hfold() {
 }
 
 void pseudo_loop::compute_WMv_WMp(cand_pos_t i, cand_pos_t j) {
-    if (j - i + 1 < 4) return;
+    if (j - i + 1 < TURN+1) return;
     energy_t m1 = E_MLStem(get_energy(i,j), get_energy(i+1,j), get_energy(i,j-1), get_energy(i+1,j-1), i, j);
     energy_t m2 = WMB.get(i,j) + PSM_penalty + b_penalty;
     if (tree->tree[j].pair <= -1) {
@@ -154,15 +156,12 @@ energy_t pseudo_loop::compute_energy_VM_restricted(cand_pos_t i, cand_pos_t j)
 energy_t pseudo_loop::compute_internal_restricted(cand_pos_t i, cand_pos_t j) {
     energy_t v_iloop = INF;
     cand_pos_t max_k = std::min(j - TURN - 2, i + MAXLOOP + 1);
-    const int ptype_closing = pair[S_[i]][S_[j]];
     for (cand_pos_t k = i + 1; k <= max_k; ++k) {
         cand_pos_t min_l = std::max(k + TURN + 1 + MAXLOOP + 2, k + j - i) - MAXLOOP - 2;
         if ((tree->up[k - 1] >= (k - i - 1))) {
             for (cand_pos_t l = j - 1; l >= min_l; --l) {
                 if (tree->up[j - 1] >= (j - l - 1)) {
-                    energy_t v_iloop_kl = E_IntLoop(k - i - 1, j - l - 1, ptype_closing, rtype[pair[S_[k]][S_[l]]], S1_[i + 1], S1_[j - 1],
-                                                    S1_[k - 1], S1_[l + 1], const_cast<vrna_param_t *>(params_))
-                                          + get_energy(k, l);
+                    energy_t v_iloop_kl = compute_int(i,j,k,l) + get_energy(k, l);
                     if(i+1==k && j-1==l) v_iloop_kl += ShapeData->get_calculated(i) + ShapeData->get_calculated(j);
                     v_iloop = std::min(v_iloop, v_iloop_kl);
                 }
@@ -264,7 +263,7 @@ void pseudo_loop::compute_WI(cand_pos_t i, cand_pos_t j) {
         WI.set(i,j) = PUP_penalty;
         return;
     }
-    for (cand_pos_t k = i + 1; k < j - TURN - 1; ++k) {
+    for (cand_pos_t k = i+1; k <= j - TURN - 1; ++k) {
         energy_t wi_1 = WI.get(i, k - 1);
         energy_t v_energy = wi_1 + get_energy(k, j);
         energy_t wmb_energy = wi_1 + WMB.get(k,j);
@@ -283,7 +282,7 @@ void pseudo_loop::compute_WI(cand_pos_t i, cand_pos_t j) {
 void pseudo_loop::compute_WIP(cand_pos_t i, cand_pos_t j) {
     energy_t m1 = INF, m2 = INF, m3 = INF, m4 = INF, m5 = INF, m6 = INF, m7 = INF;
     // branch 1:
-    for (cand_pos_t k = i + 1; k < j - TURN - 1; ++k) {
+    for (cand_pos_t k = i+1; k <= j - TURN - 1; ++k) {
         bool can_pair = tree->up[k - 1] >= (k - i);
         energy_t wi_1 = WIP.get(i,k-1);
         energy_t v_energy = get_energy(k, j);
@@ -511,11 +510,13 @@ void pseudo_loop::compute_WMBP(cand_pos_t i, cand_pos_t j) {
             // checking the borders as they may be negative
             cand_pos_t bp_il = tree->bp(i, l);
             if (bp_il >= 0 && bp_il < n && l + TURN <= j) {
-                energy_t BE_energy = get_BE(i, tree->tree[i].pair, bp_il, tree->tree[bp_il].pair);
-                energy_t WI_energy = WI.get(bp_il + 1, l - 1);
-                energy_t VP_energy = VP.get(l, j);
-                energy_t sum = BE_energy + WI_energy + VP_energy;
-                tmp = std::min(tmp, sum);
+                if (i <= tree->tree[l].parent->index && tree->tree[l].parent->index < j && l + TURN <= j) {
+                    energy_t BE_energy = get_BE(i, tree->tree[i].pair, bp_il, tree->tree[bp_il].pair);
+                    energy_t WI_energy = WI.get(bp_il + 1, l - 1);
+                    energy_t VP_energy = VP.get(l, j);
+                    energy_t sum = BE_energy + WI_energy + VP_energy;
+                    tmp = std::min(tmp, sum);
+                }
             }
         }
         m4 = 2 * PB_penalty + tmp;
@@ -584,7 +585,7 @@ void pseudo_loop::compute_BE(cand_pos_t i, cand_pos_t j, cand_pos_t ip, cand_pos
             bool weakly_closed_il = tree->weakly_closed(i + 1, l - 1);   // weakly closed between i+1 and lp-1
             bool weakly_closed_lpj = tree->weakly_closed(lp + 1, j - 1); // weakly closed between l+1 and ip-1
 
-            if (empty_region_il && empty_region_lpj) { //&& !(ip == (i+1) && jp==(j-1)) && !(l == (i+1) && lp == (j-1))){
+            if (empty_region_il && empty_region_lpj && i+1!=l && j-1!=lp) {
                 energy_t tmp = get_e_intP(i, l, lp, j) + get_BE(l, lp, ip, jp);
                 m2 = std::min(m2, tmp);
             }

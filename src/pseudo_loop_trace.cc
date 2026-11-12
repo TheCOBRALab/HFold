@@ -282,14 +282,14 @@ void pseudo_loop::Trace_WI(cand_pos_t i, cand_pos_t j, energy_t e){
         Trace_WMB(i,j,WMB.get(i,j));
         return;
     }
-    for (cand_pos_t k = i+1; k < j; ++k) {
+    for (cand_pos_t k = i+1; k <= j - TURN - 1; ++k) {
         if (e == WI.get(i,k-1) + get_energy(k,j) + PPS_penalty) {
             Trace_WI(i,k-1,WI.get(i,k-1));
             Trace_V(k,j,get_energy(k,j));
             return;
         }
     }
-    for (cand_pos_t k = i+1; k < j; ++k) {
+    for (cand_pos_t k = i+1; k <= j - TURN - 1; ++k) {
         if (e == WI.get(i,k-1) + WMB.get(k,j) + PSP_penalty + PPS_penalty) {
             Trace_WI(i,k-1,WI.get(i,k-1));
             Trace_WMB(k,j,WMB.get(k,j));
@@ -313,28 +313,28 @@ void pseudo_loop::Trace_WIP(cand_pos_t i, cand_pos_t j, energy_t e){
         Trace_WMB(i,j,WMB.get(i,j));
         return;
     }
-    for (cand_pos_t k = i + 1; k < j - TURN - 1; ++k) {
+    for (cand_pos_t k = i+1; k <= j - TURN - 1; ++k) {
         if (e == WIP.get(i,k-1) + get_energy(k,j) + bp_penalty) {
             Trace_WIP(i,k-1,WIP.get(i,k-1));
             Trace_V(k,j,get_energy(k,j));
             return;
         }
     }
-    for (cand_pos_t k = i + 1; k < j - TURN - 1; ++k) {
+    for (cand_pos_t k = i+1; k <= j - TURN - 1; ++k) {
         if (e == WIP.get(i,k-1) + WMB.get(k,j) + PSM_penalty + bp_penalty) {
             Trace_WIP(i,k-1,WIP.get(i,k-1));
             Trace_WMB(k,j,WMB.get(k,j));
             return;
         }
     }
-    for (cand_pos_t k = i + 1; k < j - TURN - 1; ++k) {
+    for (cand_pos_t k = i+1; k <= j - TURN - 1; ++k) {
         bool can_pair = tree->up[k - 1] >= (k - i);
         if (can_pair && e == static_cast<energy_t>((k-i)*cp_penalty) + get_energy(k,j) + bp_penalty){
             Trace_V(k,j,get_energy(k,j));
             return;
         }
     }
-    for (cand_pos_t k = i + 1; k < j - TURN - 1; ++k) {
+    for (cand_pos_t k = i+1; k <= j - TURN - 1; ++k) {
         bool can_pair = tree->up[k - 1] >= (k - i);
         if (can_pair && e == static_cast<energy_t>((k-i)*cp_penalty) + WMB.get(k,j) + PSM_penalty + bp_penalty){
             Trace_WMB(k,j,WMB.get(k,j));
@@ -420,11 +420,13 @@ void pseudo_loop::Trace_WMBP(cand_pos_t i, cand_pos_t j, energy_t e){
             for (cand_pos_t l = i + 1; l < j; l++) {
                 cand_pos_t bp_il = tree->bp(i, l);
                 if (bp_il >= 0 && bp_il < n && l + TURN <= j) {
-                    if (e == get_BE(i,tree->tree[i].pair, bp_il, tree->tree[bp_il].pair) + WI.get(bp_il+1,l-1) + VP.get(l,j) + 2*PB_penalty) {
-                        Trace_BE(i,tree->tree[i].pair, bp_il, tree->tree[bp_il].pair,get_BE(i,tree->tree[i].pair, bp_il, tree->tree[bp_il].pair));
-                        Trace_WI(bp_il+1,l-1,WI.get(bp_il+1,l-1));
-                        Trace_VP(l,j,VP.get(l,j));
-                        return;
+                    if (i <= tree->tree[l].parent->index && tree->tree[l].parent->index < j && l + TURN <= j) {
+                        if (e == get_BE(i,tree->tree[i].pair, bp_il, tree->tree[bp_il].pair) + WI.get(bp_il+1,l-1) + VP.get(l,j) + 2*PB_penalty) {
+                            Trace_BE(i,tree->tree[i].pair, bp_il, tree->tree[bp_il].pair,get_BE(i,tree->tree[i].pair, bp_il, tree->tree[bp_il].pair));
+                            Trace_WI(bp_il+1,l-1,WI.get(bp_il+1,l-1));
+                            Trace_VP(l,j,VP.get(l,j));
+                            return;
+                        }
                     }
                 }
             }
@@ -587,7 +589,7 @@ void pseudo_loop::Trace_BE(cand_pos_t i, cand_pos_t j, cand_pos_t ip, cand_pos_t
             bool weakly_closed_il = tree->weakly_closed(i + 1, l - 1);   // weakly closed between i+1 and lp-1
             bool weakly_closed_lpj = tree->weakly_closed(lp + 1, j - 1); // weakly closed between l+1 and ip-1
 
-            if (empty_region_il && empty_region_lpj) {
+            if (empty_region_il && empty_region_lpj && i+1!=l && j-1!=lp) {
                 if (e==get_e_intP(i,l,lp,j) + get_BE(l,lp,ip,jp)) {
                     Trace_BE(l,lp,ip,jp,get_BE(l,lp,ip,jp));
                     return;
