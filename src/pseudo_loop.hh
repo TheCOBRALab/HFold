@@ -8,9 +8,7 @@
 #include "Hotspot.hh"
 #include "s_energy_matrix.hh"
 
-#include "ViennaRNA/loops.hh"
-#include "ViennaRNA/pair_mat.hh"
-#include "ViennaRNA/params/io.hh"
+#include "vienna.hh"
 #include <string>
 
 #define debug 0

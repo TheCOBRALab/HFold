@@ -1,5 +1,5 @@
 #include "SHAPE.hh"
-#include "ViennaRNA/utils.hh"
+#include "vienna.hh"
 #include <sys/stat.h>
 #include <iostream>
 #include <sstream>

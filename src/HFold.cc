@@ -7,6 +7,7 @@
 #include "Result.hh"
 #include "Hotspot.hh"
 // a simple driver for the HFold
+#include <cmath>
 #include <iostream>
 #include <fstream>
 #include <string>

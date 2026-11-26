@@ -6,6 +6,7 @@ HFold needs a 64bit Linux or macOS operating system to run
 
 ### Software Requirements:
 - CMake 3.15 or greater
+- git and an internet connection the first time you configure: CMake downloads [ThermoRNA](https://github.com/TheCOBRALab/ThermoRNA), which provides the ViennaRNA energy parameters and loop energy functions
 
 ### CMake installation
 
@@ -69,7 +70,7 @@ Usage: HFold[options] [input sequence]
   -n, --opt              Specify the number of suboptimal structures to output (default is 1)
   -p  --pk-free          Specify whether you only want the pseudoknot-free structure to be calculated
   -k  --pk-only          Only add base pairs which cross the constraint structure. The constraint structure is returned if there are no energetically favorable crossing base pairs
-  -d  --dangles          Specify the dangle model to be used (base is 2)
+  -d  --dangles          Specify the dangle model to be used (default is 1)
   -P, --paramFile        Read energy parameters from paramfile, instead of using the default parameter set.\n
   -S, --shape            Give a path to a shape file corresponding to the sequence given
       --noConv           Do not convert DNA into RNA. This will use the Matthews 2004 parameters for DNA

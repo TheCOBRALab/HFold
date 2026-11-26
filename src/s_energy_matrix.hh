@@ -8,9 +8,7 @@
 #include <string>
 #include <vector>
 
-#include "ViennaRNA/loops.hh"
-#include "ViennaRNA/pair_mat.hh"
-#include "ViennaRNA/params/io.hh"
+#include "vienna.hh"
 
 class s_energy_matrix {
   public:

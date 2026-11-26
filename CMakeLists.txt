@@ -43,21 +43,24 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     endif()
 endif()
 
-# Embedded ViennaRNA subset used by HFold.
-add_library(RNA STATIC
-    src/ViennaRNA/params/default.cc
-    src/ViennaRNA/params/params.cc
-    src/ViennaRNA/params/io.cc
-    src/ViennaRNA/model.cc
-    src/ViennaRNA/utils.cc
-)
+# ThermoRNA's loop-energy functions are compiled in their own library, so without this link-time
+# optimisation they can't be inlined into HFold's DP loops, which makes folding about 10% slower.
+include(CheckIPOSupported)
+check_ipo_supported(RESULT HFOLD_IPO_SUPPORTED LANGUAGES CXX)
+if(HFOLD_IPO_SUPPORTED)
+    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE ON)
+    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELWITHDEBINFO ON)
+endif()
 
-target_include_directories(RNA PUBLIC
-    "${PROJECT_SOURCE_DIR}"
-    "${PROJECT_SOURCE_DIR}/src"
+# ViennaRNA parameters and loop energies, from ThermoRNA's ViennaRNA component only.
+include(FetchContent)
+set(THERMORNA_VIENNARNA ON CACHE BOOL "" FORCE)
+set(THERMORNA_RNASTRUCTURE OFF CACHE BOOL "" FORCE)
+FetchContent_Declare(ThermoRNA
+    GIT_REPOSITORY https://github.com/TheCOBRALab/ThermoRNA.git
+    GIT_TAG        v0.2.1
 )
-
-target_link_libraries(RNA PUBLIC HFoldBuildOptions)
+FetchContent_MakeAvailable(ThermoRNA)
 
 # Reusable HFold implementation. main.cc must not be included here because the
 # unit-test executable gets its main() from GoogleTest.
@@ -82,7 +85,7 @@ target_compile_definitions(HFoldLib PUBLIC
 )
 
 target_link_libraries(HFoldLib PUBLIC
-    RNA
+    ThermoRNA::ThermoRNA
     HFoldBuildOptions
 )
 
