@@ -5,10 +5,6 @@ on:
   release:
     types: [published]
 
-env:
-  VIENNARNA_VERSION: "2.7.1"
-  VIENNARNA_PREFIX: "${{ github.workspace }}/viennarna"
-
 permissions:
   contents: read
 
@@ -19,37 +15,6 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest]
     steps:
-      - uses: actions/checkout@v4
-
-      # -------------------- ViennaRNA --------------------
-      - name: Restore ViennaRNA from cache
-        id: cache-viennarna
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.VIENNARNA_PREFIX }}
-          key: viennarna-${{ env.VIENNARNA_VERSION }}-${{ runner.os }}-${{ runner.arch }}
-
-      - name: Build & install ViennaRNA
-        if: steps.cache-viennarna.outputs.cache-hit != 'true'
-        run: |
-          curl -L -O https://github.com/ViennaRNA/ViennaRNA/releases/download/v${VIENNARNA_VERSION}/ViennaRNA-${VIENNARNA_VERSION}.tar.gz
-          tar -xzf ViennaRNA-${VIENNARNA_VERSION}.tar.gz
-          cd ViennaRNA-${VIENNARNA_VERSION}
-          ./configure --without-perl --prefix="${VIENNARNA_PREFIX}"
-          CORES=$(nproc 2>/dev/null || sysctl -n hw.ncpu)
-          make -j"$CORES"
-          make install -j"$CORES"
-
-      - name: Export ViennaRNA paths
-        shell: bash
-        run: |
-          echo "VIENNARNA_LIB=${VIENNARNA_PREFIX}/lib"                                          >>"$GITHUB_ENV"
-          echo "CPATH=${VIENNARNA_PREFIX}/include:$CPATH"                                       >>"$GITHUB_ENV"
-          echo "LIBRARY_PATH=${VIENNARNA_PREFIX}/lib:$LIBRARY_PATH"                             >>"$GITHUB_ENV"
-          echo "CMAKE_PREFIX_PATH=${VIENNARNA_PREFIX}"                                          >>"$GITHUB_ENV"
-          echo "LD_LIBRARY_PATH=${VIENNARNA_PREFIX}/lib:$LD_LIBRARY_PATH"                       >>"$GITHUB_ENV"
-          echo "DYLD_FALLBACK_LIBRARY_PATH=${VIENNARNA_PREFIX}/lib:$DYLD_FALLBACK_LIBRARY_PATH" >>"$GITHUB_ENV"
-
       # -------------------- Python Build --------------------
       - uses: actions/setup-python@v5
         with:
